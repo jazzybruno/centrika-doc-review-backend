@@ -19,20 +19,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserPrincipal implements UserDetails {
     private UUID id;
-
     private String email;
-
-    private String firstName;
-
     private String phoneNumber;
-
-    private String lastName;
     @JsonIgnore
     private String password;
-
+    private String username;
     private EGender gender;
     private Collection<? extends GrantedAuthority> authorities;
-
     public static UserPrincipal create(User user) {
         Collection<SimpleGrantedAuthority> authorities = user.getRoles()
                 .stream()
@@ -44,10 +37,9 @@ public class UserPrincipal implements UserDetails {
         return new UserPrincipal(
                 user.getId(),
                 user.getEmail(),
-                user.getFirstName(),
                 user.getPhoneNumber(),
-                user.getLastName(),
                 user.getPassword(),
+                user.getUsername(),
                 user.getGender(),
                 authorities);
     }

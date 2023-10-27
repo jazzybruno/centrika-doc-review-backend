@@ -26,9 +26,12 @@ public class DocumentReview {
     @Enumerated(EnumType.STRING) private EDocStatus  status;
     // relations
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "user_reviews" , joinColumns = @JoinColumn(name = "user_id") , inverseJoinColumns = @JoinColumn(name = "documrnt"))
+    @JoinTable(name = "user_reviews" , joinColumns = @JoinColumn(name = "document_id") , inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> reviewers =  new HashSet<User>();
     @ManyToOne
     @JoinColumn(name = "document_id")
     private Document reviewDoc;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "comments_review" , joinColumns = @JoinColumn(name = "document_id") , inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    private Set<Comment> comments = new HashSet<>();
 }
