@@ -42,7 +42,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private EStatus status;
     @Column(name = "verified", columnDefinition = "boolean default false")
-    private boolean verified;
+    private boolean verified = false;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
     private Date createdAt;
@@ -51,7 +51,6 @@ public class User {
     private Date updatedAt;
     @Column(name = "activation_code")
     private String activationCode;
-
     // Define the many-to-one relationship with department
     @ManyToOne
     @JoinColumn(name = "department_id")
