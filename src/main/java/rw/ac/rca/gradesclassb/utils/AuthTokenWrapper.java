@@ -13,7 +13,6 @@ public class AuthTokenWrapper {
             throw new RuntimeException("No current request found.");
         }
 
-
         HttpServletRequest request = requestAttributes.getRequest();
 
         String bearerToken = request.getHeader("Authorization");
@@ -23,8 +22,6 @@ public class AuthTokenWrapper {
             );
             return bearerToken.substring(7); // 7 is the length of "Bearer "
         }
-
-
 
         throw new RuntimeException("Bearer token not found in the request header.");
         }

@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GradesClassbApplication {
+public class CentrikaDocReview {
 
 	public static void main(String[] args) {
-		SpringApplication.run(GradesClassbApplication.class, args);
+		SpringApplication.run(CentrikaDocReview.class, args);
 	}
 
 }
