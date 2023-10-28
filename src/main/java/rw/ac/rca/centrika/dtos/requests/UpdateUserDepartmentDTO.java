@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import rw.ac.rca.centrika.enumerations.EGender;
 
 import java.util.UUID;
 
@@ -12,13 +11,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateUserDTO {
-    private String username;
-    private String phoneNumber;
-    private String email;
-    private EGender gender;
-    private String registrationCode;
-    private String password;
+public class UpdateUserDepartmentDTO {
     private UUID departmentId;
-
+    private UUID userId;
 }

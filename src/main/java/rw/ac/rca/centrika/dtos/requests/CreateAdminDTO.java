@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rw.ac.rca.centrika.enumerations.EGender;
 
 @Getter
 @Setter
@@ -13,7 +14,7 @@ public class CreateAdminDTO {
     private String username;
     private String phoneNumber;
     private String email;
-    private String gender;
+    private EGender gender;
     private String registrationCode;
     private String password;
 }

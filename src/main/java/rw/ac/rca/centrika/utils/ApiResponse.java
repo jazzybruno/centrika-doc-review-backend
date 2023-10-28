@@ -42,8 +42,6 @@ public class ApiResponse<T> {
     }
 
 
-
-
     public ApiResponse(String message) {
         this.message = message;
     }
