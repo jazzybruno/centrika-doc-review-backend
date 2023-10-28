@@ -32,7 +32,18 @@ public class Document {
    @ManyToOne
    @JoinColumn(name = "created_by")
    private User createdBy;
-   @ManyToMany(fetch = FetchType.EAGER)
-   @JoinTable(name = "document_department" , joinColumns = @JoinColumn(name = "user_id") , inverseJoinColumns = @JoinColumn(name = "document_id"))
-   private Set<Department> departments = new HashSet<Department>();
+   @ManyToOne
+   @JoinColumn(name = "department_id")
+   private Department department;
+
+   public Document(String title, String description, String fileUrl, ECategory category, EDocStatus status, int referenceNumber, User createdBy, Department department) {
+      this.title = title;
+      this.description = description;
+      this.fileUrl = fileUrl;
+      this.category = category;
+      this.status = status;
+      this.referenceNumber = referenceNumber;
+      this.createdBy = createdBy;
+      this.department = department;
+   }
 }
