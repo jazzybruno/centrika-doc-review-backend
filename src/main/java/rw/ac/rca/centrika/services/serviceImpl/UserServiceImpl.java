@@ -170,6 +170,7 @@ public class UserServiceImpl implements UserService {
         Department department = departmentRepository.findById(updateUserDepartmentDTO.getDepartmentId()).orElseThrow(()-> {throw new NotFoundException("the Department was not found");});
         try {
             user.setDepartment(department);
+            return user;
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
