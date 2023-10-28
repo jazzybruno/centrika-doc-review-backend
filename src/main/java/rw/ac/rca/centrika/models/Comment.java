@@ -27,4 +27,11 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "documentReview_id")
     private DocumentReview documentReview;
+
+    public Comment(String content, Date createdAt, User commentCreator, DocumentReview documentReview) {
+        this.content = content;
+        this.createdAt = createdAt;
+        this.commentCreator = commentCreator;
+        this.documentReview = documentReview;
+    }
 }
