@@ -24,4 +24,10 @@ public class Department {
     @ManyToOne
     @JoinColumn(name = "created_by")
     private User createdBy;
+
+    public Department(String name, String description, User createdBy) {
+        this.name = name;
+        this.description = description;
+        this.createdBy = createdBy;
+    }
 }
