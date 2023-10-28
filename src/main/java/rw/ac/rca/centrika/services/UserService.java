@@ -1,8 +1,8 @@
 package rw.ac.rca.centrika.services;
 
-import rw.ac.rca.centrika.dtos.CreateAdminDTO;
-import rw.ac.rca.centrika.dtos.CreateUserDTO;
-import rw.ac.rca.centrika.dtos.UpdateUserDTO;
+import rw.ac.rca.centrika.dtos.requests.CreateAdminDTO;
+import rw.ac.rca.centrika.dtos.requests.CreateUserDTO;
+import rw.ac.rca.centrika.dtos.requests.UpdateUserDTO;
 import rw.ac.rca.centrika.models.User;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package rw.ac.rca.centrika.dtos;
+package rw.ac.rca.centrika.dtos.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

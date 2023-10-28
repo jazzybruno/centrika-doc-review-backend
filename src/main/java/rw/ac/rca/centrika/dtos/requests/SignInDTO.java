@@ -1,4 +1,4 @@
-package rw.ac.rca.centrika.dtos;
+package rw.ac.rca.centrika.dtos.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

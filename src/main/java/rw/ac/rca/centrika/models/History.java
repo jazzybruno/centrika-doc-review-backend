@@ -12,6 +12,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class History {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

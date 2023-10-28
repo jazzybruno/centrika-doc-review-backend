@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import rw.ac.rca.centrika.dtos.SignInDTO;
+import rw.ac.rca.centrika.dtos.requests.SignInDTO;
 import rw.ac.rca.centrika.security.JwtTokenProvider;
 import rw.ac.rca.centrika.utils.ApiResponse;
 import rw.ac.rca.centrika.utils.JWTAuthenticationResponse;
