@@ -24,6 +24,4 @@ public class Department {
     @ManyToOne
     @JoinColumn(name = "created_by")
     private User createdBy;
-    @ManyToMany(mappedBy = "departments" , fetch = FetchType.LAZY)
-    private List<Document> documents = new ArrayList<Document>();
 }
