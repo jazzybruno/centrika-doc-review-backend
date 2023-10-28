@@ -34,7 +34,6 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
 	private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
 	private final CustomUserDetailsService userService;

@@ -21,10 +21,10 @@ public class History {
     @JoinColumn(name = "document_id")
     private Document document;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id_requester")
     private User requester;
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id_approver")
     private User approver;
     @ManyToOne()
     @JoinColumn(name = "document_review_id")

@@ -57,15 +57,7 @@ public class UserServiceImpl implements UserService {
                 Department department = departmentRepository.findById(createUserDTO.getDepartmentId()).orElseThrow(()-> {throw new NotFoundException("the Department was not found");});
                 String activationCode = "123424";
                 EStatus status =  EStatus.WAIT_EMAIL_VERIFICATION;
-                User user = new User(
-                        createUserDTO.getUsername(),
-                        createUserDTO.getPhoneNumber(),
-                        createUserDTO.getEmail(),
-                        createUserDTO.getGender(),
-                        activationCode,
-                        status,
-                        department
-                )
+               return null;
             }else{
                 throw new BadRequestAlertException("Unauthorized to perform this action");
             }
