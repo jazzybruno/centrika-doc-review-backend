@@ -35,4 +35,10 @@ public class DocumentReview {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "comments_review" , joinColumns = @JoinColumn(name = "document_id") , inverseJoinColumns = @JoinColumn(name = "comment_id"))
     private Set<Comment> comments = new HashSet<>();
+    public DocumentReview(Date createdAt, EDocStatus status, Set<User> reviewers, Document reviewDoc) {
+        this.createdAt = createdAt;
+        this.status = status;
+        this.reviewers = reviewers;
+        this.reviewDoc = reviewDoc;
+    }
 }

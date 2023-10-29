@@ -13,6 +13,5 @@ import java.util.UUID;
 @NoArgsConstructor
 public class UpdateDocumentReviewDTO {
     public UUID reviewer;
-    private UUID docId;
 
 }
