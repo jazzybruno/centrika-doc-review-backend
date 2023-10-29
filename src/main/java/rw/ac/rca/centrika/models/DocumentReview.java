@@ -23,7 +23,8 @@ public class DocumentReview {
     private UUID id;
     @Column(name = "created_at")
     private Date createdAt;
-    @Enumerated(EnumType.STRING) private EDocStatus  status;
+    @Enumerated(EnumType.STRING)
+    private EDocStatus  status;
     // relations
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_reviews" , joinColumns = @JoinColumn(name = "document_id") , inverseJoinColumns = @JoinColumn(name = "user_id"))
