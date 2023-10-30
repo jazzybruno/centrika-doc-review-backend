@@ -29,4 +29,11 @@ public class History {
     @ManyToOne()
     @JoinColumn(name = "document_review_id")
     private DocumentReview documentReview;
+
+    public History(Document document, User requester, User approver, DocumentReview documentReview) {
+        this.document = document;
+        this.requester = requester;
+        this.approver = approver;
+        this.documentReview = documentReview;
+    }
 }
