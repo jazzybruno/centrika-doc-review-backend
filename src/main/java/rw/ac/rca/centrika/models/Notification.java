@@ -22,4 +22,10 @@ public class Notification {
     private User user;
     private String message;
     private boolean isRead;
+
+    public Notification(User user, String message, boolean isRead) {
+        this.user = user;
+        this.message = message;
+        this.isRead = isRead;
+    }
 }
