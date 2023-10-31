@@ -52,6 +52,8 @@ public class User {
     @Column(name = "activation_code")
     private String activationCode;
     // Define the many-to-one relationship with department
+    @Column(nullable = true , columnDefinition = "a one time token that is used for password reset")
+    private String token = null;
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;
