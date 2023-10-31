@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private IUserRepository userRepository;
     private IDepartmentRepository departmentRepository;
     private RoleServiceImpl roleService;
-    @Value("adminKey")
+    @Value("${adminKey}")
     private String adminKey;
 
     @Autowired

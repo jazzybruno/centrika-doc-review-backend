@@ -28,7 +28,6 @@ import java.util.Map;
 @EnableWebMvc
 public class GlobalExceptionHandler {
     private final MessageSource messageSource;
-
     public GlobalExceptionHandler(MessageSource messageSource) {
         this.messageSource = messageSource;
     }
