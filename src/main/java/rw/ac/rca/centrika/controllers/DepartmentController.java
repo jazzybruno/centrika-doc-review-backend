@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/departments")
+@RequestMapping("api/department")
 public class DepartmentController {
     private final DepartmentServiceImp departmentService;
 
@@ -25,22 +25,22 @@ public class DepartmentController {
         return departmentService.getAllDepartments();
     }
 
-    @GetMapping("/{deptId}")
+    @GetMapping("/id/{deptId}")
     public Department getDepartmentById(@PathVariable UUID deptId) {
         return departmentService.getDepartmentById(deptId);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public Department createDepartment(@RequestBody CreateDepartmentDTO createDepartmentDTO) {
         return departmentService.createDepartment(createDepartmentDTO);
     }
 
-    @PutMapping("/{deptId}")
+    @PutMapping("/update/{deptId}")
     public Department updateDepartment(@PathVariable UUID deptId, @RequestBody UpdateDepartmentDTO updateDepartmentDTO) {
         return departmentService.updateDepartment(deptId, updateDepartmentDTO);
     }
 
-    @DeleteMapping("/{deptId}")
+    @DeleteMapping("/delete/{deptId}")
     public Department deleteDepartment(@PathVariable UUID deptId) {
         return departmentService.deleteDepartment(deptId);
     }
