@@ -1,8 +1,14 @@
+# Ignore the HELP.md file
 HELP.md
-target/
+
+# Exclude the entire target/ directory
+/target
+
+# Exclude the maven-wrapper.jar in the .mvn/wrapper directory
 !.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+
+# Include JAR files within the target directory at the root of the project
+/target/*.jar
 
 ### STS ###
 .apt_generated
@@ -31,7 +37,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### Secrets ###
-/src/main/resources/**.properties
-
