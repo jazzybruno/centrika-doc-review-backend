@@ -24,25 +24,31 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-
         // Extract roles from userPrincipal and convert them to a list of role names
         List<String> roles = userPrincipal.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+                .toList();
 
-        return Jwts.builder()
-                .setId(userPrincipal.getId() + "")
-                .setSubject(userPrincipal.getId() + "")
-                .claim("user", userPrincipal)
-                .claim("roles", roles) // Include roles in the claim
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
+        System.out.println(userPrincipal.getId());
+
+          try {
+              String jwt =  Jwts.builder()
+                      .setId(userPrincipal.getId() + "")
+                      .setSubject(userPrincipal.getId() + "")
+                      .claim("user", userPrincipal)
+                      .claim("roles", roles) // Include roles in the claim
+                      .setIssuedAt(new Date(System.currentTimeMillis()))
+                      .setExpiration(expiryDate)
+                      .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                      .compact();
+              return jwt;
+          }catch (Exception e){
+              e.printStackTrace();
+              return null;
+          }
     }
 
 

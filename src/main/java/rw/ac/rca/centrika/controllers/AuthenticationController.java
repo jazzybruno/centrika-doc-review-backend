@@ -2,10 +2,10 @@ package rw.ac.rca.centrika.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,42 +18,52 @@ import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.security.JwtTokenProvider;
 import rw.ac.rca.centrika.services.serviceImpl.EmailService;
 import rw.ac.rca.centrika.services.serviceImpl.UserServiceImpl;
-import rw.ac.rca.centrika.utils.ApiResponse;
-import rw.ac.rca.centrika.utils.HashUtil;
-import rw.ac.rca.centrika.utils.JWTAuthenticationResponse;
-import rw.ac.rca.centrika.utils.TokenUtility;
+import rw.ac.rca.centrika.utils.*;
 
 @RestController
 @RequestMapping (path = "/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
-
     private final JwtTokenProvider jwtTokenProvider;
     private final UserServiceImpl userService;
     private final EmailService emailService;
 //    @Value("${token.expirationTimeMillis}")
     private final long tokenExpirationTimeMillis = 3600000;
+    private final AuthenticationProvider authenticationProvider;
     private static final String BASE_URL = "https://example.com/reset-password";
     @Autowired
-    public AuthenticationController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager , UserServiceImpl userService , EmailService emailService) {
+    public AuthenticationController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager , UserServiceImpl userService , EmailService emailService , AuthenticationProvider authenticationProvider) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
         this.emailService = emailService;
+        this.authenticationProvider = authenticationProvider;
     }
 
     @PostMapping (path = "/login")
     public ResponseEntity<ApiResponse> login(@Valid @RequestBody SignInDTO signInDTO) {
         String jwt = null;
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInDTO.getEmail(), signInDTO.getPassword()));
+        System.out.println("I am in the authentication api");
+        // Create a UsernamePasswordAuthenticationToken
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(signInDTO.getEmail(), signInDTO.getPassword());
+
+// Set the authentication in the SecurityContext
+        Authentication authentication = authenticationProvider.authenticate(authRequest);
+        System.out.println("I am in the authentication api after the authentication manager");
         try {
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            System.out.println("I am in the authentication api after the authentication manager third part");
             jwt = jwtTokenProvider.generateToken(authentication);
+            System.out.println("I am in the authentication api after the authentication manager fourth part");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ResponseEntity.ok(ApiResponse.success(new JWTAuthenticationResponse(jwt)));
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully Logged in",
+                new JWTAuthenticationResponse(jwt)
+        ));
     }
 
     @PostMapping("/initiate-password-reset")
@@ -68,7 +78,10 @@ public class AuthenticationController {
              String passwordResetLink = generatePasswordResetLink(user.getEmail() , user.getToken());
               try {
                  emailService.sendPasswordResetEmail(user , passwordResetLink);
-                  return ResponseEntity.ok(ApiResponse.success("Password reset initiated successfully. Check your email for instructions."));
+                  return ResponseEntity.ok().body(new ApiResponse(
+                          true ,
+                          "Initiate password reset was a success"
+                  ));
               }catch (Exception e){
                   return ResponseEntity.internalServerError().body(new ApiResponse(
                           false,
@@ -92,7 +105,10 @@ public class AuthenticationController {
                 if(user.getToken().equals(verifyEmailDTO.getCode())){
                     user.setToken(null);
                     user.setVerified(true);
-                    return ResponseEntity.ok(ApiResponse.success("Email verified successfully."));
+                    return ResponseEntity.ok().body(new ApiResponse(
+                            true ,
+                            "Email verified successfully."
+                    ));
                 }else{
                     return ResponseEntity.badRequest().body(new ApiResponse(
                             false ,
@@ -124,7 +140,10 @@ public class AuthenticationController {
                     user.setToken(null);
                      String hashedPassword = HashUtil.hashPassword(resetPasswordDTO.getNewPassword());
                      user.setPassword(hashedPassword);
-                    return ResponseEntity.ok(ApiResponse.success("Password reset successfully."));
+                    return ResponseEntity.badRequest().body(new ApiResponse(
+                            false ,
+                            "Password reset successfully"
+                    ));
                 }else{
                     return ResponseEntity.badRequest().body(new ApiResponse(
                             false ,
@@ -149,5 +168,4 @@ public class AuthenticationController {
         // Create the password reset link by appending the email and token to the base URL
         return BASE_URL + "?email=" + email + "&token=" + token;
     }
-
 }

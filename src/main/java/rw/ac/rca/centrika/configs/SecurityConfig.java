@@ -25,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import rw.ac.rca.centrika.security.CustomUserDetailsService;
 import rw.ac.rca.centrika.security.JwtAuthenticationEntryPoint;
 import rw.ac.rca.centrika.security.JwtAuthenticationFilter;
-import rw.ac.rca.centrika.utils.ApiResponse;
+import rw.ac.rca.centrika.utils.ApResponse;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -56,7 +56,7 @@ public class SecurityConfig {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 			ServletOutputStream out = response.getOutputStream();
-			new ObjectMapper().writeValue(out, new ApiResponse<String>("Invalid or missing auth token." +
+			new ObjectMapper().writeValue(out, new ApResponse<String>("Invalid or missing auth token." +
 					"",  (Object) "", HttpStatus.UNAUTHORIZED));
 
 			out.flush();
@@ -69,7 +69,7 @@ public class SecurityConfig {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 			ServletOutputStream out = response.getOutputStream();
-			new ObjectMapper().writeValue(out, new ApiResponse<String>("You are not allowed to access this resource.", (Object) "", HttpStatus.FORBIDDEN));
+			new ObjectMapper().writeValue(out, new ApResponse<String>("You are not allowed to access this resource.", (Object) "", HttpStatus.FORBIDDEN));
 			out.flush();
 		};
 	}
