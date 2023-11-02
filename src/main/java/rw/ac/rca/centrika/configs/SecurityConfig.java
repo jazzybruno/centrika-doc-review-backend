@@ -46,9 +46,11 @@ public class SecurityConfig {
 			"/swagger-ui.html",
 			"/v3/api-docs/**",
 			"/actuator/*",
-			"/api/v1/auth/**",
-			"/api/users/create-admin",
-			""
+			"/api/auth/login",
+			"/api/auth/initiate-password-reset",
+			"/api/auth/verify-email",
+			"/api/auth/reset-password",
+			"/api/users/create-admin"
 	};
 
 	@Bean

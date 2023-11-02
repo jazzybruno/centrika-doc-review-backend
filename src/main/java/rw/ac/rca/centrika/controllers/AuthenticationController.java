@@ -21,7 +21,7 @@ import rw.ac.rca.centrika.services.serviceImpl.UserServiceImpl;
 import rw.ac.rca.centrika.utils.*;
 
 @RestController
-@RequestMapping (path = "/api/v1/auth")
+@RequestMapping (path = "/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
