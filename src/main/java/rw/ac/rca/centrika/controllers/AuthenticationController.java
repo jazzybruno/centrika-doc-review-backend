@@ -16,6 +16,7 @@ import rw.ac.rca.centrika.dtos.requests.SignInDTO;
 import rw.ac.rca.centrika.dtos.requests.VerifyEmailDTO;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.security.JwtTokenProvider;
+import rw.ac.rca.centrika.security.UserPrincipal;
 import rw.ac.rca.centrika.services.serviceImpl.EmailService;
 import rw.ac.rca.centrika.services.serviceImpl.UserServiceImpl;
 import rw.ac.rca.centrika.utils.*;
@@ -44,25 +45,24 @@ public class AuthenticationController {
     @PostMapping (path = "/login")
     public ResponseEntity<ApiResponse> login(@Valid @RequestBody SignInDTO signInDTO) {
         String jwt = null;
+        UserPrincipal userPrincipal = null;
         System.out.println("I am in the authentication api");
         // Create a UsernamePasswordAuthenticationToken
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(signInDTO.getEmail(), signInDTO.getPassword());
 
 // Set the authentication in the SecurityContext
         Authentication authentication = authenticationProvider.authenticate(authRequest);
-        System.out.println("I am in the authentication api after the authentication manager");
         try {
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            System.out.println("I am in the authentication api after the authentication manager third part");
             jwt = jwtTokenProvider.generateToken(authentication);
-            System.out.println("I am in the authentication api after the authentication manager fourth part");
+            userPrincipal = UserUtils.getLoggedInUser();
         } catch (Exception e) {
             e.printStackTrace();
         }
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully Logged in",
-                new JWTAuthenticationResponse(jwt)
+                new JWTAuthenticationResponse(jwt , userPrincipal )
         ));
     }
 
