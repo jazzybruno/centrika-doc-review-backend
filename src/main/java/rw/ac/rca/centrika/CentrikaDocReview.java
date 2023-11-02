@@ -33,10 +33,9 @@ public class CentrikaDocReview {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				// Allow all origins and methods
 				registry.addMapping("/**")
 						.allowedOrigins("*")
-						.allowedMethods("*");
+						.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS");
 			}
 		};
 	}
