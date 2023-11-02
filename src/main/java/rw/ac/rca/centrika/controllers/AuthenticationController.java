@@ -3,6 +3,7 @@ package rw.ac.rca.centrika.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -46,6 +47,7 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse> login(@Valid @RequestBody SignInDTO signInDTO) {
         String jwt = null;
         UserPrincipal userPrincipal = null;
+        User user = null;
         System.out.println("I am in the authentication api");
         // Create a UsernamePasswordAuthenticationToken
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(signInDTO.getEmail(), signInDTO.getPassword());
@@ -56,13 +58,14 @@ public class AuthenticationController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             jwt = jwtTokenProvider.generateToken(authentication);
             userPrincipal = UserUtils.getLoggedInUser();
+            user = userService.getUserById(userPrincipal.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully Logged in",
-                new JWTAuthenticationResponse(jwt , userPrincipal )
+                new JWTAuthenticationResponse(jwt , user )
         ));
     }
 
@@ -161,6 +164,24 @@ public class AuthenticationController {
                     false ,
                     "The account is not present"
             ));
+        }
+    }
+
+    @GetMapping("/get-profile")
+    public ResponseEntity<ApiResponse> getLoggedInProfile(){
+        if(UserUtils.isUserLoggedIn()){
+            UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
+            User user = userService.getUserById(userPrincipal.getId());
+            return ResponseEntity.ok().body(new ApiResponse(
+                    true,
+                    "Successfully fetched the logged in user",
+                    user
+            ));
+        }else{
+             return ResponseEntity.status(401).body(new ApiResponse(
+                     false,
+                     "You are not authorized"
+             ));
         }
     }
 
