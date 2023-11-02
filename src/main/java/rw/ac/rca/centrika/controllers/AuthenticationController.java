@@ -23,6 +23,7 @@ import rw.ac.rca.centrika.services.serviceImpl.UserServiceImpl;
 import rw.ac.rca.centrika.utils.*;
 
 @RestController
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS})
 @RequestMapping (path = "/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {

@@ -10,6 +10,7 @@ import rw.ac.rca.centrika.services.serviceImpl.DepartmentServiceImp;
 import java.util.List;
 import java.util.UUID;
 
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS})
 @RestController
 @RequestMapping("api/department")
 public class DepartmentController {
