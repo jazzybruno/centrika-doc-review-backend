@@ -105,11 +105,11 @@
 			<artifactId>thymeleaf</artifactId>
 			<version>3.1.1.RELEASE</version>
 		</dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>9.0.63</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.mortbay.jetty</groupId>-->
+<!--            <artifactId>servlet-api</artifactId>-->
+<!--            <version>9.0.63</version>-->
+<!--        </dependency>-->
     </dependencies>
 
 	<build>
