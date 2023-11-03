@@ -61,7 +61,6 @@ public class UserServiceImpl implements UserService {
     public User createUser(CreateUserDTO createUserDTO) {
         Optional<User> optionalUser = userRepository.findUserByEmailOrPhoneNumber(createUserDTO.getEmail() , createUserDTO.getPhoneNumber());
         if(optionalUser.isEmpty()){
-            if(createUserDTO.getRegistrationCode().equals(adminKey)){
                 Department department = departmentRepository.findById(createUserDTO.getDepartmentId()).orElseThrow(()-> {throw new NotFoundException("the Department was not found");});
                 String activationCode = Utility.randomUUID(6 , 0 , 'N');
                 EStatus status =  EStatus.WAIT_EMAIL_VERIFICATION;
@@ -86,9 +85,6 @@ public class UserServiceImpl implements UserService {
                 }catch (Exception e){
                     throw new  InternalServerErrorException(e.getMessage());
                 }
-            }else{
-                throw new BadRequestAlertException("Unauthorized to perform this action");
-            }
         }else{
             throw new BadRequestAlertException("The User with the provided email or phone Already Exists");
         }

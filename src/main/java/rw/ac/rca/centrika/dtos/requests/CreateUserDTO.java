@@ -17,7 +17,6 @@ public class CreateUserDTO {
     private String phoneNumber;
     private String email;
     private EGender gender;
-    private String registrationCode;
     private String password;
     private UUID departmentId;
 
