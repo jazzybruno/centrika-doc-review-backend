@@ -37,7 +37,7 @@ public class UserController {
         ));
     }
 
-    @GetMapping("id/{userId}")
+    @GetMapping("/id/{userId}")
     public ResponseEntity getUserById(@PathVariable UUID userId) {
         User user = userService.getUserById(userId);
         return ResponseEntity.ok().body(new ApiResponse(
@@ -79,7 +79,7 @@ public class UserController {
         );
     }
 
-    @PatchMapping("update/{userId}")
+    @PatchMapping("/update/{userId}")
     public ResponseEntity updateUser(@PathVariable UUID userId, @RequestBody UpdateUserDTO updateUserDTO) {
         User user = userService.updateUser(userId, updateUserDTO);
         return ResponseEntity.ok(new ApiResponse(
@@ -89,7 +89,7 @@ public class UserController {
         ));
     }
 
-    @DeleteMapping("delete/{userId}")
+    @DeleteMapping("/delete/{userId}")
     public ResponseEntity deleteUser(@PathVariable UUID userId) {
         User user = userService.deleteUser(userId);
         return ResponseEntity.ok(new ApiResponse(

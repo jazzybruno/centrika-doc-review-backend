@@ -56,7 +56,19 @@ public class SecurityConfig {
 			"/api/auth/initiate-password-reset",
 			"/api/auth/verify-email",
 			"/api/auth/reset-password",
-			"/api/users/create-admin"
+			"/api/users/create-admin",
+			"/api/users/all",
+			"/api/users/id/{userId}",
+			"/api/users/email/{email}",
+			"/api/users/create",
+			"/api/users/update/{userId}",
+			"/api/users/change-department",
+			"/api/department/all",
+			"/api/department/id/{deptId}",
+			"/api/department/create",
+			"/api/department/update/{deptId}",
+			"/api/department/delete/{deptId}",
+
 	};
 
 	@Bean

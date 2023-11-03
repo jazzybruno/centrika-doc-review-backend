@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS})
 @RestController
-@RequestMapping("api/department")
+@RequestMapping("/api/department")
 public class DepartmentController {
     private final DepartmentServiceImp departmentService;
 
@@ -21,7 +21,7 @@ public class DepartmentController {
         this.departmentService = departmentService;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public List<Department> getAllDepartments() {
         return departmentService.getAllDepartments();
     }
