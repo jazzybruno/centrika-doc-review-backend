@@ -19,7 +19,6 @@ import java.util.UUID;
 @RequestMapping("/api/document")
 public class DocumentController {
     private final DocumentService documentService;
-
     @Autowired
     public DocumentController(DocumentService documentService) {
         this.documentService = documentService;

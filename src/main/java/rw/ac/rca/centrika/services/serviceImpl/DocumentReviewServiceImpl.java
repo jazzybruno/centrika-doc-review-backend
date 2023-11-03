@@ -3,6 +3,7 @@ package rw.ac.rca.centrika.services.serviceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import rw.ac.rca.centrika.dtos.requests.CreateDocumentReviewDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
@@ -13,8 +14,8 @@ import rw.ac.rca.centrika.models.DocumentReview;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.services.DocumentReviewService;
-import rw.ac.rca.centrika.services.DocumentService;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -36,8 +37,8 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     }
 
     @Override
-    public DocumentReview requestDocumentReview(CreateDocumentReviewDTO createDocumentReviewDTO) {
-        Document document = documentService.getDocumentById(createDocumentReviewDTO.getDocId());
+    public DocumentReview requestDocumentReview(MultipartFile file, CreateDocumentReviewDTO createDocumentReviewDTO) throws IOException {
+        Document document = documentService.createDocument(file ,  createDocumentReviewDTO.getCreateDocumentDTO());
         User user = userService.getUserById(createDocumentReviewDTO.getReviewer());
         try {
             EDocStatus status=EDocStatus.PENDING;
