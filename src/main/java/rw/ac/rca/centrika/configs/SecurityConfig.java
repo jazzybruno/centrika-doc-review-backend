@@ -23,12 +23,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import rw.ac.rca.centrika.security.CustomUserDetailsService;
 import rw.ac.rca.centrika.security.JwtAuthenticationEntryPoint;
 import rw.ac.rca.centrika.security.JwtAuthenticationFilter;
 import rw.ac.rca.centrika.utils.ApResponse;
+
+import java.util.Arrays;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -81,15 +84,13 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public CorsFilter corsFilter() {
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(Arrays.asList("*")); // Allow all origins
+		configuration.setAllowedMethods(Arrays.asList("*")); // Allow all methods
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowCredentials(true);
-		config.addAllowedOrigin("*"); // Permit all origins
-		config.addAllowedHeader("*"); // Permit all headers
-		config.addAllowedMethod("*"); // Permit all methods
-		source.registerCorsConfiguration("/**", config);
-		return new CorsFilter(source);
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
 	}
 
 	@Bean
@@ -101,8 +102,8 @@ public class SecurityConfig {
 						.anyRequest().authenticated())
 				.sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
 				.authenticationProvider(authenticationProvider())
-				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
+				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .cors(cors -> cors.disable());
 		return http.build();
 	}
 
