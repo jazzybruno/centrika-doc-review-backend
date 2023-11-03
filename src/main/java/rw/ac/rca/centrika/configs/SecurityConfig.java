@@ -103,7 +103,7 @@ public class SecurityConfig {
 				.sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .cors(cors -> cors.disable());
+                .cors(AbstractHttpConfigurer::disable);
 		return http.build();
 	}
 
