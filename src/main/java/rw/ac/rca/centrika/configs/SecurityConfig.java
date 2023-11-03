@@ -62,6 +62,7 @@ public class SecurityConfig {
 			"/api/users/email/{email}",
 			"/api/users/create",
 			"/api/users/update/{userId}",
+			"/api/users/delete/{userId}",
 			"/api/users/change-department",
 			"/api/department/all",
 			"/api/department/id/{deptId}",
