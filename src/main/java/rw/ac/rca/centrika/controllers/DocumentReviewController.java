@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import rw.ac.rca.centrika.dtos.requests.CreateDocumentReviewDTO;
+import rw.ac.rca.centrika.dtos.requests.RequestReviewDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
 import rw.ac.rca.centrika.models.DocumentReview;
 import rw.ac.rca.centrika.services.DocumentReviewService;
@@ -36,8 +37,8 @@ public class DocumentReviewController {
         return ResponseEntity.ok(ApResponse.success(documentReview));
     }
     @PostMapping("/request")
-    public ResponseEntity requestDocumentReview(@RequestParam("file") MultipartFile docFile, @RequestBody CreateDocumentReviewDTO createDocumentReviewDTO) throws IOException {
-        DocumentReview documentReview = documentReviewService.requestDocumentReview(docFile , createDocumentReviewDTO);
+    public ResponseEntity requestDocumentReview(@RequestParam("file") MultipartFile docFile, @ModelAttribute() RequestReviewDTO requestReviewDTO) throws IOException {
+        DocumentReview documentReview = documentReviewService.requestDocumentReview(docFile , requestReviewDTO);
         return ResponseEntity.ok(ApResponse.success(documentReview));
     }
 

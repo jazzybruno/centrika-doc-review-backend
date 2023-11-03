@@ -18,4 +18,5 @@ public interface UserService {
     public User updateUser(UUID userId , UpdateUserDTO updateUserDTO);
     public User deleteUser(UUID userId);
     public User changeDepartment(UpdateUserDepartmentDTO updateUserDepartmentDTO);
+    public List<User> getUsersByDeptId(UUID deptId);
 }

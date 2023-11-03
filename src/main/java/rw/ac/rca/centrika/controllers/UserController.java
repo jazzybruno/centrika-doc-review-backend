@@ -47,6 +47,16 @@ public class UserController {
         ));
     }
 
+    @GetMapping("/department/{deptId}")
+    public ResponseEntity getUserByDepartmentId(@PathVariable UUID deptId) {
+        List<User> users = userService.getUsersByDeptId(deptId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched the users",
+                users
+        ));
+    }
+
     @GetMapping("/email/{email}")
     public ResponseEntity getUserByEmail(@PathVariable String email) {
         User user = userService.getUserByEmail(email);

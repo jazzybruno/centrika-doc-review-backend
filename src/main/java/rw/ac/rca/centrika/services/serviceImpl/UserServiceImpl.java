@@ -30,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private IUserRepository userRepository;
     private IDepartmentRepository departmentRepository;
     private RoleServiceImpl roleService;
+    private DepartmentServiceImp departmentServiceImp;
     @Value("${adminKey}")
     private String adminKey;
 
@@ -167,6 +168,16 @@ public class UserServiceImpl implements UserService {
         try {
             user.setDepartment(department);
             return user;
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<User> getUsersByDeptId(UUID deptId) {
+        Department department = departmentServiceImp.getDepartmentById(deptId);
+        try {
+            return userRepository.findAllByDepartment(department);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }

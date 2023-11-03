@@ -1,10 +1,13 @@
 package rw.ac.rca.centrika.services.serviceImpl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import rw.ac.rca.centrika.dtos.requests.CreateDocumentDTO;
 import rw.ac.rca.centrika.dtos.requests.CreateDocumentReviewDTO;
+import rw.ac.rca.centrika.dtos.requests.RequestReviewDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
@@ -24,6 +27,12 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     private IDocumentReviewRepository documentReviewRepository;
     private DocumentServiceImpl documentService;
     private UserServiceImpl userService;
+    @Autowired
+    public DocumentReviewServiceImpl(IDocumentReviewRepository documentReviewRepository, DocumentServiceImpl documentService, UserServiceImpl userService) {
+        this.documentReviewRepository = documentReviewRepository;
+        this.documentService = documentService;
+        this.userService = userService;
+    }
 
     @Override
     public List<DocumentReview> getAllDocumentReviews() {
@@ -37,9 +46,15 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     }
 
     @Override
-    public DocumentReview requestDocumentReview(MultipartFile file, CreateDocumentReviewDTO createDocumentReviewDTO) throws IOException {
-        Document document = documentService.createDocument(file ,  createDocumentReviewDTO.getCreateDocumentDTO());
-        User user = userService.getUserById(createDocumentReviewDTO.getReviewer());
+    public DocumentReview requestDocumentReview(MultipartFile file,  RequestReviewDTO requestReviewDTO) throws IOException {
+        CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
+                requestReviewDTO.getTitle(),
+                requestReviewDTO.getDescription(),
+                requestReviewDTO.getCategory(),
+               requestReviewDTO.getDepartmentId()
+        );
+        Document document = documentService.createDocument(file , createDocumentDTO);
+        User user = userService.getUserById(requestReviewDTO.getReviewer());
         try {
             EDocStatus status=EDocStatus.PENDING;
             Date createdAt = new Date();
