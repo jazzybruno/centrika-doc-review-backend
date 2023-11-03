@@ -24,4 +24,16 @@ public class CreateDocumentDTO {
     @Enumerated(EnumType.STRING)
     private ECategory category;
     private UUID departmentId;
+    private UUID creator;
+
+    @Override
+    public String toString() {
+        return "CreateDocumentDTO{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", category=" + category +
+                ", departmentId=" + departmentId +
+                ", creator=" + creator +
+                '}';
+    }
 }

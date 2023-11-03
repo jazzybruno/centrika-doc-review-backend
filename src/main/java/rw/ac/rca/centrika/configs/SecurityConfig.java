@@ -59,6 +59,7 @@ public class SecurityConfig {
 			"/api/users/create-admin",
 			"/api/users/all",
 			"/api/users/id/{userId}",
+			"/api/users/department/{deptId}",
 			"/api/users/email/{email}",
 			"/api/users/create",
 			"/api/users/update/{userId}",

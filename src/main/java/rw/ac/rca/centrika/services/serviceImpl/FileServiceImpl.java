@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption;
 @Service
 public class FileServiceImpl implements FileService {
 
-    @Value("D:\\SpringImages")
+    @Value("C:\\SpringDocs")
     private String uploadDir;
 
     public String uploadFile(MultipartFile file) throws IOException {

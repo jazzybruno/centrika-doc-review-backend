@@ -47,15 +47,23 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
 
     @Override
     public DocumentReview requestDocumentReview(MultipartFile file,  RequestReviewDTO requestReviewDTO) throws IOException {
+        System.out.println(file.getOriginalFilename());
+        System.out.println(requestReviewDTO.toString());
         CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
                 requestReviewDTO.getTitle(),
                 requestReviewDTO.getDescription(),
                 requestReviewDTO.getCategory(),
-               requestReviewDTO.getDepartmentId()
+               requestReviewDTO.getDepartmentId(),
+                requestReviewDTO.getCreator()
         );
+        System.out.println(createDocumentDTO.toString());
+
+        System.out.println("Hello world this is the first step");
         Document document = documentService.createDocument(file , createDocumentDTO);
+        System.out.println("Hello world this is the first after second step");
         User user = userService.getUserById(requestReviewDTO.getReviewer());
         try {
+            System.out.println("Hello world this is the second step");
             EDocStatus status=EDocStatus.PENDING;
             Date createdAt = new Date();
            Set<User> reviewers = new HashSet<User>();
@@ -66,6 +74,7 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                    reviewers,
                    document
            );
+            System.out.println("Hello world this is the third step");
            documentReviewRepository.save(documentReview);
            return documentReview;
         }catch (Exception e){

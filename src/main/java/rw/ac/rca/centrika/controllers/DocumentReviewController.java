@@ -10,6 +10,7 @@ import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
 import rw.ac.rca.centrika.models.DocumentReview;
 import rw.ac.rca.centrika.services.DocumentReviewService;
 import rw.ac.rca.centrika.utils.ApResponse;
+import rw.ac.rca.centrika.utils.ApiResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,7 +40,11 @@ public class DocumentReviewController {
     @PostMapping("/request")
     public ResponseEntity requestDocumentReview(@RequestParam("file") MultipartFile docFile, @ModelAttribute() RequestReviewDTO requestReviewDTO) throws IOException {
         DocumentReview documentReview = documentReviewService.requestDocumentReview(docFile , requestReviewDTO);
-        return ResponseEntity.ok(ApResponse.success(documentReview));
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully demanded a review",
+                documentReview
+        ));
     }
 
     @PutMapping("/{docReviewId}")

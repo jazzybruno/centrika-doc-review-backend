@@ -1,5 +1,6 @@
 package rw.ac.rca.centrika.services.serviceImpl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,16 +27,16 @@ import rw.ac.rca.centrika.utils.Utility;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private IUserRepository userRepository;
     private IDepartmentRepository departmentRepository;
     private RoleServiceImpl roleService;
-    private DepartmentServiceImp departmentServiceImp;
     @Value("${adminKey}")
     private String adminKey;
 
     @Autowired
-    public UserServiceImpl(IUserRepository iUserRepository, IDepartmentRepository iDepartmentRepository, RoleServiceImpl roleService ) {
+    public UserServiceImpl(IUserRepository iUserRepository, IDepartmentRepository iDepartmentRepository, RoleServiceImpl roleService  ) {
         this.userRepository = iUserRepository;
         this.departmentRepository = iDepartmentRepository;
         this.roleService = roleService;
@@ -80,6 +81,7 @@ public class UserServiceImpl implements UserService {
                 Set<Role> roles = new HashSet<Role>();
                 roles.add(role);
                 user.setRoles(roles);
+                user.setDepartment(department);
                 try {
                     userRepository.save(user);
                     return user;
@@ -175,7 +177,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getUsersByDeptId(UUID deptId) {
-        Department department = departmentServiceImp.getDepartmentById(deptId);
+        Department department = departmentRepository.findById(deptId).orElseThrow(()-> {throw new NotFoundException("The department was not found");
+        });
         try {
             return userRepository.findAllByDepartment(department);
         }catch (Exception e){
