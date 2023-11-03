@@ -29,18 +29,6 @@ public class CentrikaDocReview {
 	}
 
 	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
-						.allowedOrigins("*")
-						.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS");
-			}
-		};
-	}
-
-	@Bean
 	public void registerRoles(){
 		Set<EUserRole> userRoleSet = new HashSet<>();
 		userRoleSet.add(EUserRole.ADMIN);
