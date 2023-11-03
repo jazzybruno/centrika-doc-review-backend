@@ -16,9 +16,8 @@ import java.util.UUID;
 
 @RestController
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS})
-@RequestMapping("/api/documents")
+@RequestMapping("/api/document")
 public class DocumentController {
-
     private final DocumentService documentService;
 
     @Autowired
