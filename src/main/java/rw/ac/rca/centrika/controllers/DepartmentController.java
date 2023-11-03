@@ -1,11 +1,13 @@
 package rw.ac.rca.centrika.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rw.ac.rca.centrika.dtos.requests.CreateDepartmentDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDepartmentDTO;
 import rw.ac.rca.centrika.models.Department;
 import rw.ac.rca.centrika.services.serviceImpl.DepartmentServiceImp;
+import rw.ac.rca.centrika.utils.ApiResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,27 +24,47 @@ public class DepartmentController {
     }
 
     @GetMapping("/all")
-    public List<Department> getAllDepartments() {
-        return departmentService.getAllDepartments();
+    public ResponseEntity<ApiResponse> getAllDepartments() {
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all departments",
+                departmentService.getAllDepartments()
+        ));
     }
 
     @GetMapping("/id/{deptId}")
-    public Department getDepartmentById(@PathVariable UUID deptId) {
-        return departmentService.getDepartmentById(deptId);
+    public ResponseEntity<ApiResponse> getDepartmentById(@PathVariable UUID deptId) {
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched the department",
+                departmentService.getDepartmentById(deptId)
+        ));
     }
 
     @PostMapping("/create")
-    public Department createDepartment(@RequestBody CreateDepartmentDTO createDepartmentDTO) {
-        return departmentService.createDepartment(createDepartmentDTO);
+    public ResponseEntity<ApiResponse> createDepartment(@RequestBody CreateDepartmentDTO createDepartmentDTO) {
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully created the department",
+                departmentService.createDepartment(createDepartmentDTO)
+        ));
     }
 
     @PutMapping("/update/{deptId}")
-    public Department updateDepartment(@PathVariable UUID deptId, @RequestBody UpdateDepartmentDTO updateDepartmentDTO) {
-        return departmentService.updateDepartment(deptId, updateDepartmentDTO);
+    public ResponseEntity<ApiResponse> updateDepartment(@PathVariable UUID deptId, @RequestBody UpdateDepartmentDTO updateDepartmentDTO) {
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully updated the departments",
+                departmentService.updateDepartment(deptId, updateDepartmentDTO)
+        ));
     }
 
     @DeleteMapping("/delete/{deptId}")
-    public Department deleteDepartment(@PathVariable UUID deptId) {
-        return departmentService.deleteDepartment(deptId);
+    public ResponseEntity<ApiResponse> deleteDepartment(@PathVariable UUID deptId) {
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully deleted the departments",
+                departmentService.deleteDepartment(deptId)
+        ));
     }
 }
