@@ -3,6 +3,7 @@ package rw.ac.rca.centrika.services;
 import org.springframework.web.multipart.MultipartFile;
 import rw.ac.rca.centrika.dtos.requests.CreateDocumentReviewDTO;
 import rw.ac.rca.centrika.dtos.requests.RequestReviewDTO;
+import rw.ac.rca.centrika.dtos.requests.ReviewDocumentDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
 import rw.ac.rca.centrika.models.DocumentReview;
 
@@ -24,4 +25,5 @@ public interface DocumentReviewService {
 
     public List<DocumentReview> getDocumentsReviewsThatWereRequested(UUID reviewerId);
     public List<DocumentReview> getDocumentsReviewsThatWereRequestedByUser(UUID senderId);
+    public DocumentReview reviewTheDocument(ReviewDocumentDTO reviewDocumentDTO);
 }

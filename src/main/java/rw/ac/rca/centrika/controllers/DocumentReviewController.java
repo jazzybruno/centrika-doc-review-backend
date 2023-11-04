@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import rw.ac.rca.centrika.dtos.requests.CreateDocumentReviewDTO;
 import rw.ac.rca.centrika.dtos.requests.RequestReviewDTO;
+import rw.ac.rca.centrika.dtos.requests.ReviewDocumentDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
 import rw.ac.rca.centrika.models.DocumentReview;
 import rw.ac.rca.centrika.services.DocumentReviewService;
@@ -93,6 +94,16 @@ public class DocumentReviewController {
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully deleted a review",
+                documentReview
+        ));
+    }
+
+    @PostMapping("/doc/review")
+    public ResponseEntity reviewTheDocument(@RequestBody ReviewDocumentDTO reviewDocumentDTO){
+        DocumentReview documentReview = documentReviewService.reviewTheDocument(reviewDocumentDTO);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully reviewed the document",
                 documentReview
         ));
     }

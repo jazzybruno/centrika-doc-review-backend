@@ -5,17 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import rw.ac.rca.centrika.dtos.requests.CreateDocumentDTO;
-import rw.ac.rca.centrika.dtos.requests.CreateDocumentReviewDTO;
-import rw.ac.rca.centrika.dtos.requests.RequestReviewDTO;
-import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
+import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
+import rw.ac.rca.centrika.enumerations.EReviewStatus;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
-import rw.ac.rca.centrika.models.Document;
-import rw.ac.rca.centrika.models.DocumentReview;
-import rw.ac.rca.centrika.models.Notification;
-import rw.ac.rca.centrika.models.User;
+import rw.ac.rca.centrika.models.*;
+import rw.ac.rca.centrika.repositories.ICommentRepository;
 import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.services.DocumentReviewService;
@@ -30,12 +26,14 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     private DocumentServiceImpl documentService;
     private UserServiceImpl userService;
     private INotificationRepository notificationRepository;
+    private ICommentRepository commentRepository;
     @Autowired
-    public DocumentReviewServiceImpl(IDocumentReviewRepository documentReviewRepository, DocumentServiceImpl documentService, UserServiceImpl userService , INotificationRepository notificationRepository) {
+    public DocumentReviewServiceImpl(IDocumentReviewRepository documentReviewRepository, DocumentServiceImpl documentService, UserServiceImpl userService , INotificationRepository notificationRepository ,  ICommentRepository commentRepository) {
         this.documentReviewRepository = documentReviewRepository;
         this.documentService = documentService;
         this.userService = userService;
         this.notificationRepository = notificationRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -131,5 +129,57 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
+    }
+
+    @Override
+    @Transactional
+    public DocumentReview reviewTheDocument(ReviewDocumentDTO reviewDocumentDTO) {
+        DocumentReview documentReview = this.getDocumentReviewById(reviewDocumentDTO.getReviewDocId());
+        User user = userService.getUserById(reviewDocumentDTO.getReviewer());
+        String rejectNotificationMessage = "The Document was rejected by: " + user.getUsername() + " check the comments to fix the document";
+        String approveNotificationMessage = "The Document was approved by: " + user.getUsername();
+        String forwardNotificationMessage = "The Document was forwarded to you for review by: " + user.getUsername();
+        Notification notification = new Notification();
+        Comment comment = new Comment(
+           reviewDocumentDTO.getCommentContent(),
+                new Date(),
+                user,
+                documentReview
+        );
+
+          try {
+              switch (reviewDocumentDTO.getEReviewStatus()){
+                  case REJECT :
+                      documentReview.setStatus(EDocStatus.REJECTED);
+                      notification.setCreatedAt(new Date());
+                      notification.setUser(documentReview.getReviewDoc().getCreatedBy());
+                      notification.setMessage(rejectNotificationMessage);
+                      notification.setRead(false);
+                      notificationRepository.save(notification);
+                      commentRepository.save(comment);
+                  case APPROVE:
+                      documentReview.setStatus(EDocStatus.APPROVED);
+                      notification.setCreatedAt(new Date());
+                      notification.setUser(documentReview.getReviewDoc().getCreatedBy());
+                      notification.setMessage(approveNotificationMessage);
+                      notification.setRead(false);
+                      notificationRepository.save(notification);
+                      commentRepository.save(comment);
+                  case FORWARD:
+                      User newReviewer = userService.getUserById(reviewDocumentDTO.getNewReviewerId());
+                      Set<User> users = documentReview.getReviewers();
+                      users.add(newReviewer);
+                      documentReview.setReviewers(users);
+                      notification.setCreatedAt(new Date());
+                      notification.setMessage(forwardNotificationMessage);
+                      notification.setUser(newReviewer);
+                      notification.setRead(false);
+                      notificationRepository.save(notification);
+                      commentRepository.save(comment);
+              }
+              return documentReview;
+          }catch (Exception e){
+              throw new InternalServerErrorException(e.getMessage());
+          }
     }
 }
