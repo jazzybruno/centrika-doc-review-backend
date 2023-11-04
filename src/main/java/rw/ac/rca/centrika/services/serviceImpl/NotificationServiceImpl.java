@@ -91,4 +91,34 @@ public class NotificationServiceImpl implements NotificationService {
             throw new InternalServerErrorException(e.getMessage());
         }
     }
+
+    @Override
+    @Transactional
+    public List<Notification> markAllAsRead(UUID userId) {
+        List<Notification> notifications = this.getAllNotificationsByUser(userId);
+        for (Notification notification : notifications){
+            notification.setRead(true);
+        }
+        return notifications;
+    }
+
+    @Override
+    public List<Notification> getAllRead(UUID userId) {
+        User user = userService.getUserById(userId);
+        try {
+            return notificationRepository.findAllByUserAndAndRead(user , true);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Notification> getAllUnRead(UUID userId) {
+        User user = userService.getUserById(userId);
+        try {
+            return notificationRepository.findAllByUserAndAndRead(user , false);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
 }

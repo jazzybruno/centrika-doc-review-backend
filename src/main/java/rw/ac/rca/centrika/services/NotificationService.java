@@ -17,4 +17,7 @@ public interface NotificationService {
 
     // other methods
     public Notification markAsRead(UUID notId);
+    public List<Notification> markAllAsRead(UUID userId);
+    public List<Notification> getAllRead(UUID userId);
+    public List<Notification> getAllUnRead(UUID userId);
 }

@@ -42,6 +42,18 @@ public class NotificationController {
         return ResponseEntity.ok(ApResponse.success(notifications));
     }
 
+    @GetMapping("/user/read/{userId}")
+    public ResponseEntity getAllNotificationsByUserRead(@PathVariable UUID userId) {
+        List<Notification> notifications = notificationService.getAllRead(userId);
+        return ResponseEntity.ok(ApResponse.success(notifications));
+    }
+
+    @GetMapping("/user/unread/{userId}")
+    public ResponseEntity getAllNotificationsByUserUnRead(@PathVariable UUID userId) {
+        List<Notification> notifications = notificationService.getAllUnRead(userId);
+        return ResponseEntity.ok(ApResponse.success(notifications));
+    }
+
     @PostMapping("/create")
     public ResponseEntity createNotification(@RequestBody CreateNotificationDTO createNotificationDTO) {
         Notification notification = notificationService.createdNotification(createNotificationDTO);
@@ -63,6 +75,12 @@ public class NotificationController {
     @PutMapping("/mark-as-read/{notificationId}")
     public ResponseEntity markNotificationAsRead(@PathVariable UUID notificationId) {
         Notification notification = notificationService.markAsRead(notificationId);
+        return ResponseEntity.ok(ApResponse.success(notification));
+    }
+
+    @PutMapping("/user/mark-as-read/all/{userId}")
+    public ResponseEntity markNotificationAllAsRead(@PathVariable UUID userId) {
+        List<Notification> notification = notificationService.markAllAsRead(userId);
         return ResponseEntity.ok(ApResponse.success(notification));
     }
 }
