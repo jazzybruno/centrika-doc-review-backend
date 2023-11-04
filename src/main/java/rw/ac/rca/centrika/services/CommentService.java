@@ -17,5 +17,6 @@ public interface CommentService {
     // other methods
     public List<Comment> getCommentByDocumentReview(UUID documentReviewId);
     public List<Comment> getCommentByUser();
+    // other methods
 
 }

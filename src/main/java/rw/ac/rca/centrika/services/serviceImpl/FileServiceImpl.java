@@ -16,6 +16,10 @@ public class FileServiceImpl implements FileService {
     @Value("${uploads.dir}")
     private String uploadDir;
 
+    public String generateDownloadLink(String fileName){
+
+    }
+
     public String uploadFile(MultipartFile file) throws IOException {
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         Path filePath = Path.of(uploadDir + File.separator + fileName);
