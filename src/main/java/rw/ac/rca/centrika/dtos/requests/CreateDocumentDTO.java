@@ -26,14 +26,4 @@ public class CreateDocumentDTO {
     private UUID departmentId;
     private UUID creator;
 
-    @Override
-    public String toString() {
-        return "CreateDocumentDTO{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", category=" + category +
-                ", departmentId=" + departmentId +
-                ", creator=" + creator +
-                '}';
-    }
 }

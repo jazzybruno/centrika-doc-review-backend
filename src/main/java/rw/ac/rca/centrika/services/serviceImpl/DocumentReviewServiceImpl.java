@@ -14,8 +14,10 @@ import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.Document;
 import rw.ac.rca.centrika.models.DocumentReview;
+import rw.ac.rca.centrika.models.Notification;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
+import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.services.DocumentReviewService;
 
 import java.io.IOException;
@@ -27,11 +29,13 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     private IDocumentReviewRepository documentReviewRepository;
     private DocumentServiceImpl documentService;
     private UserServiceImpl userService;
+    private INotificationRepository notificationRepository;
     @Autowired
-    public DocumentReviewServiceImpl(IDocumentReviewRepository documentReviewRepository, DocumentServiceImpl documentService, UserServiceImpl userService) {
+    public DocumentReviewServiceImpl(IDocumentReviewRepository documentReviewRepository, DocumentServiceImpl documentService, UserServiceImpl userService , INotificationRepository notificationRepository) {
         this.documentReviewRepository = documentReviewRepository;
         this.documentService = documentService;
         this.userService = userService;
+        this.notificationRepository = notificationRepository;
     }
 
     @Override
@@ -47,8 +51,6 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
 
     @Override
     public DocumentReview requestDocumentReview(MultipartFile file,  RequestReviewDTO requestReviewDTO) throws IOException {
-        System.out.println(file.getOriginalFilename());
-        System.out.println(requestReviewDTO.toString());
         CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
                 requestReviewDTO.getTitle(),
                 requestReviewDTO.getDescription(),
@@ -56,14 +58,10 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                requestReviewDTO.getDepartmentId(),
                 requestReviewDTO.getCreator()
         );
-        System.out.println(createDocumentDTO.toString());
 
-        System.out.println("Hello world this is the first step");
         Document document = documentService.createDocument(file , createDocumentDTO);
-        System.out.println("Hello world this is the first after second step");
         User user = userService.getUserById(requestReviewDTO.getReviewer());
         try {
-            System.out.println("Hello world this is the second step");
             EDocStatus status=EDocStatus.PENDING;
             Date createdAt = new Date();
            Set<User> reviewers = new HashSet<User>();
@@ -74,7 +72,13 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                    reviewers,
                    document
            );
-            System.out.println("Hello world this is the third step");
+           String message =  "You have a new document review requested from: " +  document.getCreatedBy().getUsername();
+            Notification notification = new Notification(
+                    user,
+                    message,
+                    false
+            );
+            notificationRepository.save(notification);
            documentReviewRepository.save(documentReview);
            return documentReview;
         }catch (Exception e){
@@ -104,6 +108,24 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         try {
             documentReviewRepository.deleteById(docReviewId);
             return documentReview;
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentReview> getDocumentsReviewsThatWereRequested(UUID reviewerId) {
+        try {
+            return documentReviewRepository.getAllDocumentsReviewByReviewer(reviewerId);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentReview> getDocumentsReviewsThatWereRequestedByUser(UUID senderId) {
+        try {
+            return documentReviewRepository.getAllDocumentsReviewByCreator(senderId);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }

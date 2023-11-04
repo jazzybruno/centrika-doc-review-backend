@@ -24,15 +24,4 @@ public class RequestReviewDTO {
     public UUID reviewer;
     public UUID creator;
 
-    @Override
-    public String toString() {
-        return "RequestReviewDTO{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", category=" + category +
-                ", departmentId=" + departmentId +
-                ", reviewer=" + reviewer +
-                ", creator=" + creator +
-                '}';
-    }
 }

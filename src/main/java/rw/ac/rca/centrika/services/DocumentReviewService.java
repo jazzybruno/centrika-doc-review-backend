@@ -6,6 +6,7 @@ import rw.ac.rca.centrika.dtos.requests.RequestReviewDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
 import rw.ac.rca.centrika.models.DocumentReview;
 
+import javax.print.Doc;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -20,4 +21,7 @@ public interface DocumentReviewService {
     public DocumentReview updateDocumentReview(UUID docReviewId , UpdateDocumentReviewDTO updateDocumentReviewDTO) ;
     public DocumentReview deleteDocumentReview(UUID docReviewId);
     // other methods
+
+    public List<DocumentReview> getDocumentsReviewsThatWereRequested(UUID reviewerId);
+    public List<DocumentReview> getDocumentsReviewsThatWereRequestedByUser(UUID senderId);
 }

@@ -61,13 +61,9 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public Document createDocument(MultipartFile docFile ,  CreateDocumentDTO createDocumentDTO) throws IOException {
-        System.out.println("Hello world this is the first step in document");
-        System.out.println(createDocumentDTO.getDepartmentId());
         Department department = departmentRepository.findById(createDocumentDTO.getDepartmentId()).orElseThrow(() -> {throw new NotFoundException("The Department was not found");
         });
-        System.out.println("Hello world this is the first step");
 //        if(UserUtils.isUserLoggedIn()){
-            System.out.println("Hello world this is the auth one");
           try {
 //              UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
 //              assert userPrincipal != null;
@@ -77,7 +73,6 @@ public class DocumentServiceImpl implements DocumentService {
               int referenceNumber = Utility.randomNum();
               EDocStatus status = EDocStatus.PENDING;
               ECategory category = createDocumentDTO.getCategory();
-              System.out.println("Hello world this is the first step");
               Document document = new Document(
                       createDocumentDTO.getTitle(),
                       createDocumentDTO.getDescription(),
@@ -88,7 +83,6 @@ public class DocumentServiceImpl implements DocumentService {
                       user,
                       department
               );
-              System.out.println("Hello world this is the first step");
               documentRepository.save(document);
               return document;
           }catch (Exception e){

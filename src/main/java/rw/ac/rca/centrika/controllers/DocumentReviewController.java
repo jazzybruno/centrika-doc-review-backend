@@ -29,13 +29,43 @@ public class DocumentReviewController {
     @GetMapping
     public ResponseEntity getAllDocumentReviews() {
         List<DocumentReview> documentReviews = documentReviewService.getAllDocumentReviews();
-        return ResponseEntity.ok(ApResponse.success(documentReviews));
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched the document reviews",
+                documentReviews
+                )
+        );
     }
 
+    @GetMapping("/reviewer/{reviewerId}")
+    public ResponseEntity getAllDocumentReviewsByReviewer(@PathVariable UUID reviewerId) {
+        List<DocumentReview> documentReviews = documentReviewService.getDocumentsReviewsThatWereRequested(reviewerId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                        true,
+                        "Successfully fetched the document reviews by the reviewer",
+                        documentReviews
+                )
+        );
+    }
+
+    @GetMapping("/sender/{senderId}")
+    public ResponseEntity getAllDocumentReviewsBySender(@PathVariable UUID senderId) {
+        List<DocumentReview> documentReviews = documentReviewService.getDocumentsReviewsThatWereRequestedByUser(senderId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                        true,
+                        "Successfully fetched the document reviews by the sender",
+                        documentReviews
+                )
+        );
+    }
     @GetMapping("/{docReviewId}")
     public ResponseEntity getDocumentReviewById(@PathVariable UUID docReviewId) {
         DocumentReview documentReview = documentReviewService.getDocumentReviewById(docReviewId);
-        return ResponseEntity.ok(ApResponse.success(documentReview));
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully got a review",
+                documentReview
+        ));
     }
     @PostMapping("/request")
     public ResponseEntity requestDocumentReview(@RequestParam("file") MultipartFile docFile, @ModelAttribute() RequestReviewDTO requestReviewDTO) throws IOException {
@@ -50,12 +80,20 @@ public class DocumentReviewController {
     @PutMapping("/{docReviewId}")
     public ResponseEntity updateDocumentReview(@PathVariable UUID docReviewId, @RequestBody UpdateDocumentReviewDTO updateDocumentReviewDTO) {
         DocumentReview documentReview = documentReviewService.updateDocumentReview(docReviewId, updateDocumentReviewDTO);
-        return ResponseEntity.ok(ApResponse.success(documentReview));
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully updated a review",
+                documentReview
+        ));
     }
 
     @DeleteMapping("/{docReviewId}")
     public ResponseEntity deleteDocumentReview(@PathVariable UUID docReviewId) {
         DocumentReview documentReview = documentReviewService.deleteDocumentReview(docReviewId);
-        return ResponseEntity.ok(ApResponse.success(documentReview));
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully deleted a review",
+                documentReview
+        ));
     }
 }
