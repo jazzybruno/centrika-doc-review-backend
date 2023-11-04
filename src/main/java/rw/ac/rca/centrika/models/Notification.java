@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -22,6 +23,7 @@ public class Notification {
     private User user;
     private String message;
     private boolean isRead;
+    private Date createdAt;
 
     public Notification(User user, String message, boolean isRead) {
         this.user = user;

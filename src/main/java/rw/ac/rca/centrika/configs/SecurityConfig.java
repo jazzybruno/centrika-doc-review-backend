@@ -72,9 +72,8 @@ public class SecurityConfig {
 			"/api/department/delete/{deptId}",
 			"/api/comments/**",
 			"/api/document/**",
-			"/api/document-reviews/**"
-
-
+			"/api/document-reviews/**",
+			"/api/notifications/**"
 	};
 
 	@Bean

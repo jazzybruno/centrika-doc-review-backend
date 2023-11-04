@@ -12,6 +12,7 @@ import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.services.NotificationService;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,6 +52,8 @@ public class NotificationServiceImpl implements NotificationService {
                      createNotificationDTO.getMessage(),
                      isRead
              );
+            Date date = new Date();
+            notification.setCreatedAt(date);
              notificationRepository.save(notification);
              return notification;
         }catch (Exception e){
@@ -106,7 +109,7 @@ public class NotificationServiceImpl implements NotificationService {
     public List<Notification> getAllRead(UUID userId) {
         User user = userService.getUserById(userId);
         try {
-            return notificationRepository.findAllByUserAndAndRead(user , true);
+            return notificationRepository.getAllByUserAndRead(userId , true);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -116,7 +119,7 @@ public class NotificationServiceImpl implements NotificationService {
     public List<Notification> getAllUnRead(UUID userId) {
         User user = userService.getUserById(userId);
         try {
-            return notificationRepository.findAllByUserAndAndRead(user , false);
+            return notificationRepository.getAllByUserAndRead(userId , false);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }

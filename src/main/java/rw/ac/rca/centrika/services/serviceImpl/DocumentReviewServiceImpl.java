@@ -78,6 +78,8 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                     message,
                     false
             );
+            Date date = new Date();
+            notification.setCreatedAt(date);
             notificationRepository.save(notification);
            documentReviewRepository.save(documentReview);
            return documentReview;
