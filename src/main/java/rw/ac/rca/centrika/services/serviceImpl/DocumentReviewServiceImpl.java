@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
 import rw.ac.rca.centrika.enumerations.EReviewStatus;
+import rw.ac.rca.centrika.exceptions.BadRequestAlertException;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.*;
@@ -138,7 +139,6 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         User user = userService.getUserById(reviewDocumentDTO.getReviewer());
         String rejectNotificationMessage = "The Document was rejected by: " + user.getUsername() + " check the comments to fix the document";
         String approveNotificationMessage = "The Document was approved by: " + user.getUsername();
-        String forwardNotificationMessage = "The Document was forwarded to you for review by: " + user.getUsername();
         Notification notification = new Notification();
         Comment comment = new Comment(
            reviewDocumentDTO.getCommentContent(),
@@ -146,40 +146,59 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                 user,
                 documentReview
         );
-
           try {
-              switch (reviewDocumentDTO.getEReviewStatus()){
-                  case REJECT :
-                      documentReview.setStatus(EDocStatus.REJECTED);
-                      notification.setCreatedAt(new Date());
-                      notification.setUser(documentReview.getReviewDoc().getCreatedBy());
-                      notification.setMessage(rejectNotificationMessage);
-                      notification.setRead(false);
-                      notificationRepository.save(notification);
-                      commentRepository.save(comment);
-                  case APPROVE:
-                      documentReview.setStatus(EDocStatus.APPROVED);
-                      notification.setCreatedAt(new Date());
-                      notification.setUser(documentReview.getReviewDoc().getCreatedBy());
-                      notification.setMessage(approveNotificationMessage);
-                      notification.setRead(false);
-                      notificationRepository.save(notification);
-                      commentRepository.save(comment);
-                  case FORWARD:
-                      User newReviewer = userService.getUserById(reviewDocumentDTO.getNewReviewerId());
-                      Set<User> users = documentReview.getReviewers();
-                      users.add(newReviewer);
-                      documentReview.setReviewers(users);
-                      notification.setCreatedAt(new Date());
-                      notification.setMessage(forwardNotificationMessage);
-                      notification.setUser(newReviewer);
-                      notification.setRead(false);
-                      notificationRepository.save(notification);
-                      commentRepository.save(comment);
+              if(reviewDocumentDTO.getStatus().equals(EReviewStatus.REJECT)){
+                  documentReview.setStatus(EDocStatus.REJECTED);
+                  notification.setCreatedAt(new Date());
+                  notification.setUser(documentReview.getReviewDoc().getCreatedBy());
+                  notification.setMessage(rejectNotificationMessage);
+                  notification.setRead(false);
+                  notificationRepository.save(notification);
+                  commentRepository.save(comment);
+              }else if (reviewDocumentDTO.getStatus().equals(EReviewStatus.APPROVE)){
+                  documentReview.setStatus(EDocStatus.APPROVED);
+                  notification.setCreatedAt(new Date());
+                  notification.setUser(documentReview.getReviewDoc().getCreatedBy());
+                  notification.setMessage(approveNotificationMessage);
+                  notification.setRead(false);
+                  notificationRepository.save(notification);
+                  commentRepository.save(comment);
+              }else{
+                  throw new BadRequestAlertException("The status must be REJECT or APPROVE");
               }
               return documentReview;
           }catch (Exception e){
+              e.printStackTrace();
               throw new InternalServerErrorException(e.getMessage());
           }
+    }
+
+    @Override
+    public DocumentReview forwardTheDocument(ForwardDocumentDTO forwardDocumentDTO) {
+        DocumentReview documentReview = this.getDocumentReviewById(forwardDocumentDTO.getReviewDocId());
+        User user = userService.getUserById(forwardDocumentDTO.getReviewer());
+        String forwardNotificationMessage = "The Document was forwarded to you for review by: " + user.getUsername();
+        Notification notification = new Notification();
+        Comment comment = new Comment(
+                forwardDocumentDTO.getCommentContent(),
+                new Date(),
+                user,
+                documentReview
+        );
+       try {
+           User newReviewer = userService.getUserById(forwardDocumentDTO.getNewReviewerId());
+           Set<User> users = documentReview.getReviewers();
+           users.add(newReviewer);
+           documentReview.setReviewers(users);
+           notification.setCreatedAt(new Date());
+           notification.setMessage(forwardNotificationMessage);
+           notification.setUser(newReviewer);
+           notification.setRead(false);
+           notificationRepository.save(notification);
+           commentRepository.save(comment);
+           return documentReview;
+       }catch (Exception e){
+           throw new InternalServerErrorException(e.getMessage());
+       }
     }
 }

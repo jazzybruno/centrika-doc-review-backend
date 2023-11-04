@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import rw.ac.rca.centrika.dtos.requests.CreateDocumentReviewDTO;
-import rw.ac.rca.centrika.dtos.requests.RequestReviewDTO;
-import rw.ac.rca.centrika.dtos.requests.ReviewDocumentDTO;
-import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
+import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.models.DocumentReview;
 import rw.ac.rca.centrika.services.DocumentReviewService;
 import rw.ac.rca.centrika.utils.ApResponse;
@@ -78,6 +75,8 @@ public class DocumentReviewController {
         ));
     }
 
+
+
     @PutMapping("/{docReviewId}")
     public ResponseEntity updateDocumentReview(@PathVariable UUID docReviewId, @RequestBody UpdateDocumentReviewDTO updateDocumentReviewDTO) {
         DocumentReview documentReview = documentReviewService.updateDocumentReview(docReviewId, updateDocumentReviewDTO);
@@ -104,6 +103,16 @@ public class DocumentReviewController {
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully reviewed the document",
+                documentReview
+        ));
+    }
+
+    @PostMapping("/doc/forward")
+    public ResponseEntity forwardTheDocument(@RequestBody ForwardDocumentDTO forwardDocumentDTO){
+        DocumentReview documentReview = documentReviewService.forwardTheDocument(forwardDocumentDTO);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully forwarded the document",
                 documentReview
         ));
     }

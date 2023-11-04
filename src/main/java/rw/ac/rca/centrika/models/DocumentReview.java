@@ -1,5 +1,7 @@
 package rw.ac.rca.centrika.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,8 +34,8 @@ public class DocumentReview {
     @ManyToOne
     @JoinColumn(name = "document_id")
     private Document reviewDoc;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "comments_review" , joinColumns = @JoinColumn(name = "document_id") , inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    @JsonIgnore
+    @OneToMany(mappedBy = "documentReview" , fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
     public DocumentReview(Date createdAt, EDocStatus status, Set<User> reviewers, Document reviewDoc) {
         this.createdAt = createdAt;
