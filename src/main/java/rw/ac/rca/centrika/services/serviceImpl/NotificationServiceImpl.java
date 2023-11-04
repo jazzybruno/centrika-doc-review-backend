@@ -85,6 +85,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Transactional
     public Notification markAsRead(UUID notId) {
         Notification notification = this.getNotificationById(notId);
         try {
