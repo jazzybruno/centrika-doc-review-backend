@@ -17,7 +17,8 @@ public class FileServiceImpl implements FileService {
     private String uploadDir;
 
     public String generateDownloadLink(String fileName){
-
+        Path filePath = Path.of(uploadDir + File.separator + fileName);
+        return filePath.toString();
     }
 
     public String uploadFile(MultipartFile file) throws IOException {
