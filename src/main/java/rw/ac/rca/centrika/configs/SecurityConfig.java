@@ -73,6 +73,9 @@ public class SecurityConfig {
 			"/api/comments/**",
 			"/api/document/**",
 			"/api/document-reviews/**",
+			"/api/document-reviews",
+			"/api/document-reviews",
+			"/api/document-reviews/reviewer/{reviewerId}",
 			"/api/notifications/**"
 	};
 
