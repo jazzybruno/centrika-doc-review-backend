@@ -12,6 +12,7 @@ import rw.ac.rca.centrika.enumerations.EGender;
 import rw.ac.rca.centrika.enumerations.EStatus;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -66,6 +67,9 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    @ManyToMany(fetch = FetchType.EAGER , mappedBy = "members")
+    private List<Group> groups;
 
     public User(String username, String phoneNumber, String email, EGender gender, String password, EStatus status, boolean verified , String activationCode) {
         this.username = username;

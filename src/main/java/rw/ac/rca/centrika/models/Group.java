@@ -20,5 +20,6 @@ public class Group {
     private UUID id;
     private String name;
     @ManyToMany
+    @JoinTable(name = "user_groups" , joinColumns = @JoinColumn(name = "group_id") , inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> members;
 }

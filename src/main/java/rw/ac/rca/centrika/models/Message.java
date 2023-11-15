@@ -23,6 +23,5 @@ public class Message {
     @ManyToOne
     private User receiver;
     @ManyToOne
-    @JoinTable(name = "user_groups" , joinColumns = @JoinColumn(name = "group_id") , inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Group group;
 }
