@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -13,16 +14,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ChatMessage {
+public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID messageId;
-    @ManyToOne
-    @JoinColumn(name = "sender_id")
-    private User sender;
-    @Column
-    private String message;
-    @ManyToOne
-    @JoinColumn(name = "receiver_id")
-    private User receiver;
+    private UUID id;
+    private String name;
+    @ManyToMany
+    private Set<User> members;
 }
