@@ -19,6 +19,7 @@ public class Group {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String name;
+    private String description;
     @ManyToMany
     @JoinTable(name = "user_groups" , joinColumns = @JoinColumn(name = "group_id") , inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> members;
