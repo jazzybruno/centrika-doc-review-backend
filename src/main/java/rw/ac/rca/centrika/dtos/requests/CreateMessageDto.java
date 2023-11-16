@@ -13,5 +13,6 @@ import java.util.UUID;
 @Setter
 public class CreateMessageDto {
     private String content;
-    private UUID receiver;
+    private UUID senderId;
+    private UUID receiverId;
 }

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -27,4 +28,6 @@ public class Message {
     @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
+    private Date createdAt;
+    private Date updatedAt;
 }

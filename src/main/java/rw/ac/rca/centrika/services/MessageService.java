@@ -14,6 +14,6 @@ public interface MessageService {
     boolean delete(UUID id);
     Message update(UUID id , String content);
     List<Message> getAll();
-    List<Message> getAllByReceiverAndSender(UUID receiverId);
+    List<Message> getAllByReceiverAndSender(UUID senderId ,  UUID receiverId);
     List<Message> getAllByGroup(UUID group);
 }

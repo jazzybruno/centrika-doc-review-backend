@@ -13,5 +13,6 @@ import java.util.UUID;
 @Setter
 public class CreateGroupMessageDto {
     private String content;
-    private UUID group;
+    private UUID senderId;
+    private UUID groupId;
 }
