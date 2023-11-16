@@ -22,13 +22,13 @@ public class MessageController {
     private MessageServiceImpl messageService;
 
     @PostMapping(value = "/create/dm")
-    public ResponseEntity<Message> savePersonal(CreateMessageDto dto) {
+    public ResponseEntity<Message> savePersonal(@RequestBody CreateMessageDto dto) {
         log.info("The Entity {} of a direct message was saved" , ENTITY);
          return ResponseEntity.status(HttpStatus.CREATED).body(this.messageService.savePersonal(dto));
     }
 
     @PostMapping(value = "/create/group")
-    public ResponseEntity<Message> saveGroup(CreateGroupMessageDto dto) {
+    public ResponseEntity<Message> saveGroup(@RequestBody CreateGroupMessageDto dto) {
         log.info("The Entity {} of a group message was saved" , ENTITY);
         return ResponseEntity.status(HttpStatus.CREATED).body(this.messageService.saveGroup(dto));
     }
