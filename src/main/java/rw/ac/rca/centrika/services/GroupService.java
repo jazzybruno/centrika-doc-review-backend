@@ -13,4 +13,5 @@ public interface GroupService {
     Group removeUser(UUID groupId , UUID userId);
     Group getById(UUID id);
     List<Group> getAll();
+    List<Group> getAllByUser(UUID id);
 }
