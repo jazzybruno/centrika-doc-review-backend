@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
@@ -15,19 +16,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SpringBootApplication
+@ComponentScan("rw.ac.rca.centrika")
 public class CentrikaDocReview {
-
 	private RoleServiceImpl roleService;
-
 	@Autowired
 	public CentrikaDocReview(RoleServiceImpl roleService) {
 		this.roleService = roleService;
 	}
-
 	public static void main(String[] args) {
 		SpringApplication.run(CentrikaDocReview.class, args);
 	}
-
 	@Bean
 	public void registerRoles(){
 		Set<EUserRole> userRoleSet = new HashSet<>();

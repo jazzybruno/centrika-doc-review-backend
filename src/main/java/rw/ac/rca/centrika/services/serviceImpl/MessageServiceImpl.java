@@ -26,7 +26,6 @@ public class MessageServiceImpl implements MessageService {
     private MessageRepository messageRepository;
     private GroupRepository groupRepository;
     public final String internalServerErrorMessage = "Failed try again!!";
-
     @Override
     public Message savePersonal(CreateMessageDto dto) {
         User sender = userRepository.findById(dto.getSenderId()).orElseThrow(()-> {throw new NotFoundException("The sender was not found");});
