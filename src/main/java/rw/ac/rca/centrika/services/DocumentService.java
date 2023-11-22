@@ -21,4 +21,7 @@ public interface DocumentService {
     public Document deleteDocument(UUID doc_id );
     public Document approveDocument(UUID doc_id);
 //    public Document rejectDocument(UUID doc_id);
+
+    // Other method other usages
+    public int getReferenceNumber();
 }

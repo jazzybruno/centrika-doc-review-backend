@@ -152,4 +152,13 @@ public class DocumentServiceImpl implements DocumentService {
             throw new InternalServerErrorException(e.getMessage());
         }
     }
+
+    @Override
+    public int getReferenceNumber() {
+        List<Document> documents = documentRepository.findAll();
+        documents.stream().filter(document -> {
+            return document.getCategory().equals(ECategory.EXTERNAL);
+        });
+        return documents.size() + 1;
+    }
 }

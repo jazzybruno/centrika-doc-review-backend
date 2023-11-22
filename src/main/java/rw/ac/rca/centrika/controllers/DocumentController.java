@@ -136,5 +136,15 @@ public class DocumentController {
                 document
         ));
     }
+
+    @GetMapping("/reference-number")
+    public ResponseEntity getReferenceNumber() {
+        int referenceNumber = this.documentService.getReferenceNumber();
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "The documents reference number was fetched successfully",
+                referenceNumber
+        ));
+    }
 }
 
