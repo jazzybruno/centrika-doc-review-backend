@@ -155,10 +155,7 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public int getReferenceNumber() {
-        List<Document> documents = documentRepository.findAll();
-        documents.stream().filter(document -> {
-            return document.getCategory().equals(ECategory.EXTERNAL);
-        });
+        List<Document> documents = documentRepository.findAllByCategory(ECategory.EXTERNAL);
         return documents.size() + 1;
     }
 }
