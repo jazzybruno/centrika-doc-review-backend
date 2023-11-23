@@ -50,6 +50,9 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
 
     @Override
     public DocumentReview requestDocumentReview(MultipartFile file,  RequestReviewDTO requestReviewDTO) throws IOException {
+        if(requestReviewDTO.getCreator().equals(requestReviewDTO.getReviewer())){
+            throw new BadRequestAlertException("Failed , The user can not review his or her document");
+        }
         CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
                 requestReviewDTO.getTitle(),
                 requestReviewDTO.getDescription(),
