@@ -46,15 +46,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
-        List<User >  users =  userRepository.findAll();
-        for (User user : users){
-            assert userPrincipal != null;
-            if(user.getId().equals(userPrincipal.getId())){
-                users.remove(user);
-            }
-        }
-        return users;
+        return userRepository.findAll();
     }
 
     @Override
@@ -190,15 +182,7 @@ public class UserServiceImpl implements UserService {
         Department department = departmentRepository.findById(deptId).orElseThrow(()-> {throw new NotFoundException("The department was not found");
         });
         try {
-            UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
-            List<User >  users =  userRepository.findAllByDepartment(department);
-            for (User user : users){
-                assert userPrincipal != null;
-                if(user.getId().equals(userPrincipal.getId())){
-                    users.remove(user);
-                }
-            }
-            return users;
+            return userRepository.findAllByDepartment(department);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
