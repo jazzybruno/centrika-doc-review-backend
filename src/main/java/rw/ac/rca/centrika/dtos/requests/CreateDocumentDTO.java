@@ -25,5 +25,6 @@ public class CreateDocumentDTO {
     private ECategory category;
     private UUID departmentId;
     private UUID creator;
+    private UUID docReviewId;
 
 }

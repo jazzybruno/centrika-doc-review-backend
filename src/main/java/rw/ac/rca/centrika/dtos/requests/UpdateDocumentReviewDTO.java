@@ -1,9 +1,12 @@
 package rw.ac.rca.centrika.dtos.requests;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rw.ac.rca.centrika.enumerations.ECategory;
 
 import java.util.UUID;
 
@@ -12,6 +15,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateDocumentReviewDTO {
+    private String title;
+    private String description;
+    @Enumerated(EnumType.STRING)
+    private ECategory category;
+    private UUID departmentId;
     public UUID reviewer;
+    public UUID creator;
 
 }

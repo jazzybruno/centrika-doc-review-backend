@@ -24,6 +24,7 @@ import rw.ac.rca.centrika.utils.Utility;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,6 +84,7 @@ public class DocumentServiceImpl implements DocumentService {
                       user,
                       department
               );
+              document.setCreatedAt(new Date());
               documentRepository.save(document);
               return document;
           }catch (Exception e){

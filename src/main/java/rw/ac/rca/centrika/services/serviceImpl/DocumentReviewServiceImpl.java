@@ -49,20 +49,13 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     }
 
     @Override
+    @Transactional
     public DocumentReview requestDocumentReview(MultipartFile file,  RequestReviewDTO requestReviewDTO) throws IOException {
         if(requestReviewDTO.getCreator().equals(requestReviewDTO.getReviewer())){
             throw new BadRequestAlertException("Failed , The user can not review his or her document");
         }
-        CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
-                requestReviewDTO.getTitle(),
-                requestReviewDTO.getDescription(),
-                requestReviewDTO.getCategory(),
-               requestReviewDTO.getDepartmentId(),
-                requestReviewDTO.getCreator()
-        );
-
-        Document document = documentService.createDocument(file , createDocumentDTO);
         User user = userService.getUserById(requestReviewDTO.getReviewer());
+        User user1 = userService.getUserById(requestReviewDTO.getCreator());
         try {
             EDocStatus status=EDocStatus.PENDING;
             Date createdAt = new Date();
@@ -71,10 +64,9 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
            DocumentReview documentReview = new DocumentReview(
                    createdAt,
                    status,
-                   reviewers,
-                   document
+                   reviewers
            );
-           String message =  "You have a new document review requested from: " +  document.getCreatedBy().getUsername();
+           String message =  "You have a new document review requested from: " +  user1.getUsername();
             Notification notification = new Notification(
                     user,
                     message,
@@ -83,7 +75,17 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
             Date date = new Date();
             notification.setCreatedAt(date);
             notificationRepository.save(notification);
-           documentReviewRepository.save(documentReview);
+            documentReviewRepository.save(documentReview);
+            CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
+                    requestReviewDTO.getTitle(),
+                    requestReviewDTO.getDescription(),
+                    requestReviewDTO.getCategory(),
+                    requestReviewDTO.getDepartmentId(),
+                    requestReviewDTO.getCreator(),
+                    documentReview.getId()
+            );
+            Document document = documentService.createDocument(file , createDocumentDTO);
+            documentReview.setCurrentDocument(document);
            return documentReview;
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
@@ -92,14 +94,36 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
 
     @Override
     @Transactional
-    public DocumentReview updateDocumentReview(UUID docReviewId, UpdateDocumentReviewDTO updateDocumentReviewDTO) {
+    public DocumentReview updateDocumentReview(MultipartFile file ,  UUID docReviewId, UpdateDocumentReviewDTO updateDocumentReviewDTO) {
         DocumentReview documentReview = documentReviewRepository.findById(docReviewId).orElseThrow(() -> {throw new NotFoundException("The document Review was not found");
         });
         User user = userService.getUserById(updateDocumentReviewDTO.getReviewer());
+        User user1 = userService.getUserById(updateDocumentReviewDTO.getCreator());
         try {
             Set<User> users = documentReview.getReviewers();
             users.add(user);
             documentReview.setReviewers(users);
+            documentReview.setStatus(EDocStatus.PENDING);
+            documentReview.setUpdatedAt(new Date());
+            CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
+                    updateDocumentReviewDTO.getTitle(),
+                    updateDocumentReviewDTO.getDescription(),
+                    updateDocumentReviewDTO.getCategory(),
+                    updateDocumentReviewDTO.getDepartmentId(),
+                    updateDocumentReviewDTO.getCreator(),
+                    documentReview.getId()
+            );
+            Document document = documentService.createDocument(file , createDocumentDTO);
+            documentReview.setCurrentDocument(document);
+            String message =  "You have an updated document review from: " +  user1.getUsername();
+            Notification notification = new Notification(
+                    user,
+                    message,
+                    false
+            );
+            Date date = new Date();
+            notification.setCreatedAt(date);
+            notificationRepository.save(notification);
             return documentReview;
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
@@ -151,17 +175,19 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         );
           try {
               if(reviewDocumentDTO.getStatus().equals(EReviewStatus.REJECT)){
+                  documentReview.getCurrentDocument().setStatus(EDocStatus.REJECTED);
                   documentReview.setStatus(EDocStatus.REJECTED);
                   notification.setCreatedAt(new Date());
-                  notification.setUser(documentReview.getReviewDoc().getCreatedBy());
+                  notification.setUser(documentReview.getCurrentDocument().getCreatedBy());
                   notification.setMessage(rejectNotificationMessage);
                   notification.setRead(false);
                   notificationRepository.save(notification);
                   commentRepository.save(comment);
               }else if (reviewDocumentDTO.getStatus().equals(EReviewStatus.APPROVE)){
+                  documentReview.getCurrentDocument().setStatus(EDocStatus.APPROVED);
                   documentReview.setStatus(EDocStatus.APPROVED);
                   notification.setCreatedAt(new Date());
-                  notification.setUser(documentReview.getReviewDoc().getCreatedBy());
+                  notification.setUser(documentReview.getCurrentDocument().getCreatedBy());
                   notification.setMessage(approveNotificationMessage);
                   notification.setRead(false);
                   notificationRepository.save(notification);

@@ -78,8 +78,8 @@ public class DocumentReviewController {
 
 
     @PutMapping("/{docReviewId}")
-    public ResponseEntity updateDocumentReview(@PathVariable UUID docReviewId, @RequestBody UpdateDocumentReviewDTO updateDocumentReviewDTO) {
-        DocumentReview documentReview = documentReviewService.updateDocumentReview(docReviewId, updateDocumentReviewDTO);
+    public ResponseEntity updateDocumentReview(@RequestParam("file") MultipartFile docFile, @PathVariable UUID docReviewId, @ModelAttribute() UpdateDocumentReviewDTO updateDocumentReviewDTO) {
+        DocumentReview documentReview = documentReviewService.updateDocumentReview(docFile , docReviewId, updateDocumentReviewDTO);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully updated a review",
