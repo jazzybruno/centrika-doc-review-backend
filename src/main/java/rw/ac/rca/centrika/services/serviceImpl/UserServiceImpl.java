@@ -20,8 +20,10 @@ import rw.ac.rca.centrika.models.Role;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.repositories.IDepartmentRepository;
 import rw.ac.rca.centrika.repositories.IUserRepository;
+import rw.ac.rca.centrika.security.UserPrincipal;
 import rw.ac.rca.centrika.services.UserService;
 import rw.ac.rca.centrika.utils.HashUtil;
+import rw.ac.rca.centrika.utils.UserUtils;
 import rw.ac.rca.centrika.utils.Utility;
 
 import java.util.*;
@@ -44,7 +46,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
+        List<User >  users =  userRepository.findAll();
+        for (User user : users){
+            assert userPrincipal != null;
+            if(user.getId().equals(userPrincipal.getId())){
+                users.remove(user);
+            }
+        }
+        return users;
     }
 
     @Override
@@ -180,7 +190,15 @@ public class UserServiceImpl implements UserService {
         Department department = departmentRepository.findById(deptId).orElseThrow(()-> {throw new NotFoundException("The department was not found");
         });
         try {
-            return userRepository.findAllByDepartment(department);
+            UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
+            List<User >  users =  userRepository.findAllByDepartment(department);
+            for (User user : users){
+                assert userPrincipal != null;
+                if(user.getId().equals(userPrincipal.getId())){
+                    users.remove(user);
+                }
+            }
+            return users;
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
