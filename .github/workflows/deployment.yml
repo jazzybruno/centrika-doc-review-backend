@@ -3,7 +3,7 @@ name: Build, Test and Deploy Educable App
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build:
