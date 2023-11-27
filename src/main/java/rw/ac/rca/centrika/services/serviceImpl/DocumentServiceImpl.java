@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
 
     private final IDocumentRepository documentRepository;
@@ -99,7 +98,7 @@ public class DocumentServiceImpl implements DocumentService {
                       referenceNumber,
                       user,
                       department,
-                       documentReview
+                      documentReview
               );
               document.setCreatedAt(new Date());
               documentRepository.save(document);
