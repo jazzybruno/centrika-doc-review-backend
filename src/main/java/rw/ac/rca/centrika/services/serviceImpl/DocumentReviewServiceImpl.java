@@ -75,14 +75,14 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
             Date date = new Date();
             notification.setCreatedAt(date);
             notificationRepository.save(notification);
-            documentReviewRepository.save(documentReview);
+            DocumentReview review = documentReviewRepository.save(documentReview);
             CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
                     requestReviewDTO.getTitle(),
                     requestReviewDTO.getDescription(),
                     requestReviewDTO.getCategory(),
                     requestReviewDTO.getDepartmentId(),
                     requestReviewDTO.getCreator(),
-                    documentReview.getId()
+                    review.getId()
             );
             Document document = documentService.createDocument(file , createDocumentDTO);
             documentReview.setCurrentDocument(document);
