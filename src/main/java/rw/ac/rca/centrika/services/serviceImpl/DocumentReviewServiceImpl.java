@@ -77,6 +77,9 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
             notification.setCreatedAt(date);
             notificationRepository.save(notification);
             DocumentReview review = documentReviewRepository.save(documentReview);
+            if(review.getId() == null){
+                throw new InternalServerErrorException("Failed to create the document review");
+            }
             CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
                     requestReviewDTO.getTitle(),
                     requestReviewDTO.getDescription(),
