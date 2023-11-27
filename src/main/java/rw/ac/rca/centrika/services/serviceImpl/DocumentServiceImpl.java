@@ -1,6 +1,7 @@
 package rw.ac.rca.centrika.services.serviceImpl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,10 +15,13 @@ import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.exceptions.UnAuthorizedException;
 import rw.ac.rca.centrika.models.Department;
 import rw.ac.rca.centrika.models.Document;
+import rw.ac.rca.centrika.models.DocumentReview;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.repositories.IDepartmentRepository;
 import rw.ac.rca.centrika.repositories.IDocumentRepository;
+import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.security.UserPrincipal;
+import rw.ac.rca.centrika.services.DocumentReviewService;
 import rw.ac.rca.centrika.services.DocumentService;
 import rw.ac.rca.centrika.utils.UserUtils;
 import rw.ac.rca.centrika.utils.Utility;
@@ -36,6 +40,16 @@ public class DocumentServiceImpl implements DocumentService {
     private final UserServiceImpl userService;
     private final IDepartmentRepository departmentRepository;
     private final  FileServiceImpl  fileService;
+    private final IDocumentReviewRepository documentReviewRepository;
+
+    @Autowired
+    public DocumentServiceImpl(IDocumentRepository documentRepository, UserServiceImpl userService, IDepartmentRepository departmentRepository, FileServiceImpl fileService, IDocumentReviewRepository documentReviewRepository) {
+        this.documentRepository = documentRepository;
+        this.userService = userService;
+        this.departmentRepository = departmentRepository;
+        this.fileService = fileService;
+        this.documentReviewRepository = documentReviewRepository;
+    }
 
     @Override
     public List<Document> getAllDocuments() {
@@ -64,6 +78,8 @@ public class DocumentServiceImpl implements DocumentService {
     public Document createDocument(MultipartFile docFile ,  CreateDocumentDTO createDocumentDTO) throws IOException {
         Department department = departmentRepository.findById(createDocumentDTO.getDepartmentId()).orElseThrow(() -> {throw new NotFoundException("The Department was not found");
         });
+        DocumentReview documentReview = documentReviewRepository.findById(createDocumentDTO.getDocReviewId()).orElseThrow(() -> {throw new NotFoundException("The Document Review was not found");
+        });
 //        if(UserUtils.isUserLoggedIn()){
           try {
 //              UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
@@ -82,7 +98,8 @@ public class DocumentServiceImpl implements DocumentService {
                       status,
                       referenceNumber,
                       user,
-                      department
+                      department,
+                       documentReview
               );
               document.setCreatedAt(new Date());
               documentRepository.save(document);

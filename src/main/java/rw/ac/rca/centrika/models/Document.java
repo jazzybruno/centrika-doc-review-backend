@@ -45,7 +45,7 @@ public class Document {
    @Column(name = "updated_at")
    private Date updatedAt;
 
-   public Document(String title, String description, String fileUrl, ECategory category, EDocStatus status, int referenceNumber, User createdBy, Department department) {
+   public Document(String title, String description, String fileUrl, ECategory category, EDocStatus status, int referenceNumber, User createdBy, Department department , DocumentReview reviewDoc) {
       this.title = title;
       this.description = description;
       this.fileUrl = fileUrl;
@@ -54,5 +54,6 @@ public class Document {
       this.referenceNumber = referenceNumber;
       this.createdBy = createdBy;
       this.department = department;
+      this.reviewDoc = reviewDoc;
    }
 }
