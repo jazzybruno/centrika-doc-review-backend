@@ -64,7 +64,8 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
            DocumentReview documentReview = new DocumentReview(
                    createdAt,
                    status,
-                   reviewers
+                   reviewers,
+                   user1
            );
            String message =  "You have a new document review requested from: " +  user1.getUsername();
             Notification notification = new Notification(

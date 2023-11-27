@@ -36,14 +36,19 @@ public class DocumentReview {
     private List<Document> reviewDocList = new ArrayList<Document>();
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User creator;
+
+    @ManyToOne
     @JoinColumn(name = "current_doc_id")
     private Document currentDocument;
     @JsonIgnore
     @OneToMany(mappedBy = "documentReview" , fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
-    public DocumentReview(Date createdAt, EDocStatus status, Set<User> reviewers ) {
+    public DocumentReview(Date createdAt, EDocStatus status, Set<User> reviewers , User creator ) {
         this.createdAt = createdAt;
         this.status = status;
         this.reviewers = reviewers;
+        this.creator = creator;
     }
 }
