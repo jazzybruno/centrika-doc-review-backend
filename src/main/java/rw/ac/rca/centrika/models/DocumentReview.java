@@ -32,6 +32,7 @@ public class DocumentReview {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_reviews" , joinColumns = @JoinColumn(name = "document_id") , inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> reviewers =  new HashSet<User>();
+
     @OneToMany(mappedBy = "reviewDoc" , fetch = FetchType.EAGER)
     private List<Document> reviewDocList = new ArrayList<Document>();
 
@@ -39,9 +40,8 @@ public class DocumentReview {
     @JoinColumn(name = "user_id")
     private User creator;
 
-    @ManyToOne
-    @JoinColumn(name = "current_doc_id")
-    private Document currentDocument;
+    @Column(name = "current_doc_id")
+    private UUID currentDocument;
     @JsonIgnore
     @OneToMany(mappedBy = "documentReview" , fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();

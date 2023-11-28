@@ -89,7 +89,7 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                     review.getId()
             );
             Document document = documentService.createDocument(file , createDocumentDTO);
-            documentReview.setCurrentDocument(document);
+            documentReview.setCurrentDocument(document.getId());
            return documentReview;
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
@@ -118,7 +118,7 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                     documentReview.getId()
             );
             Document document = documentService.createDocument(file , createDocumentDTO);
-            documentReview.setCurrentDocument(document);
+            documentReview.setCurrentDocument(document.getId());
             String message =  "You have an updated document review from: " +  user1.getUsername();
             Notification notification = new Notification(
                     user,
@@ -177,21 +177,22 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                 user,
                 documentReview
         );
+        Document currentDocument = documentService.getDocumentById(documentReview.getCurrentDocument());
           try {
               if(reviewDocumentDTO.getStatus().equals(EReviewStatus.REJECT)){
-                  documentReview.getCurrentDocument().setStatus(EDocStatus.REJECTED);
+                  currentDocument.setStatus(EDocStatus.REJECTED);
                   documentReview.setStatus(EDocStatus.REJECTED);
                   notification.setCreatedAt(new Date());
-                  notification.setUser(documentReview.getCurrentDocument().getCreatedBy());
+                  notification.setUser(currentDocument.getCreatedBy());
                   notification.setMessage(rejectNotificationMessage);
                   notification.setRead(false);
                   notificationRepository.save(notification);
                   commentRepository.save(comment);
               }else if (reviewDocumentDTO.getStatus().equals(EReviewStatus.APPROVE)){
-                  documentReview.getCurrentDocument().setStatus(EDocStatus.APPROVED);
+                  currentDocument.setStatus(EDocStatus.APPROVED);
                   documentReview.setStatus(EDocStatus.APPROVED);
                   notification.setCreatedAt(new Date());
-                  notification.setUser(documentReview.getCurrentDocument().getCreatedBy());
+                  notification.setUser(currentDocument.getCreatedBy());
                   notification.setMessage(approveNotificationMessage);
                   notification.setRead(false);
                   notificationRepository.save(notification);

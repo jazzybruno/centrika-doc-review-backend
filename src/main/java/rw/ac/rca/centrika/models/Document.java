@@ -1,5 +1,6 @@
 package rw.ac.rca.centrika.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class Document {
    private EDocStatus status;
    private int referenceNumber;
    @ManyToOne
+   @JsonIgnore
    @JoinColumn(name = "document_review_id")
    private DocumentReview reviewDoc;
    @ManyToOne
