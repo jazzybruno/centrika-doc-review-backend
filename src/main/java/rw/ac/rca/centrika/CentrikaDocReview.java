@@ -31,6 +31,7 @@ public class CentrikaDocReview {
 		Set<EUserRole> userRoleSet = new HashSet<>();
 		userRoleSet.add(EUserRole.ADMIN);
 		userRoleSet.add(EUserRole.USER);
+		userRoleSet.add(EUserRole.DEPARTMENT_HEAD);
 		for (EUserRole role : userRoleSet){
 			if(!(roleService.isRolePresent(role))){
 				roleService.createRole(role);

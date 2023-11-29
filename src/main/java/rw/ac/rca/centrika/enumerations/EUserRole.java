@@ -1,5 +1,5 @@
 package rw.ac.rca.centrika.enumerations;
 
 public enum EUserRole {
-    ADMIN, USER
+    ADMIN, USER , DEPARTMENT_HEAD
 }
