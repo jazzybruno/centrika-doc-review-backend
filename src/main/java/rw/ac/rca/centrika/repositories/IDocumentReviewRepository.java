@@ -13,4 +13,7 @@ public interface IDocumentReviewRepository extends JpaRepository<DocumentReview,
     List<DocumentReview> getAllDocumentsReviewByCreator(UUID creatorId);
     @Query(nativeQuery = true , value = "SELECT dr.* FROM document_review dr INNER JOIN user_reviews usr ON dr.id = usr.document_id WHERE usr.user_id = ?1")
     List<DocumentReview> getAllDocumentsReviewByReviewer(UUID reviwerId);
+
+    @Query(nativeQuery = true , value = "SELECT dr.* FROM document_review dr INNER JOIN users usr ON dr.user_id = usr.id WHERE usr.department_id = ?1")
+    List<DocumentReview> getAllDocumentsReviewByDepartment(UUID departmentId);
 }

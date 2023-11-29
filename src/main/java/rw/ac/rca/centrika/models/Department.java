@@ -27,6 +27,9 @@ public class Department {
     @Column(name = "department_head")
     private UUID departmentHead = null;
 
+    @Transient
+    private User createdByUser;
+
     public Department(String name, String description, UUID createdBy) {
         this.name = name;
         this.description = description;

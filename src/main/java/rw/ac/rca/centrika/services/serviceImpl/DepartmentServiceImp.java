@@ -36,7 +36,17 @@ public class DepartmentServiceImp implements DepartmentService {
     }
     @Override
     public List<Department> getAllDepartments() {
-        return departmentRepository.findAll();
+        List<Department> departments = departmentRepository.findAll();
+        if(departments.isEmpty()){
+            throw new NotFoundException("No departments found");
+        }
+        departments.forEach(department -> {
+            if(department.getCreatedBy() != null){
+                User user = userService.getUserById(department.getCreatedBy());
+                department.setCreatedByUser(user);
+            }
+        });
+        return departments;
     }
 
     @Override

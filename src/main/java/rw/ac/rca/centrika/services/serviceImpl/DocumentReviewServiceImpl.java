@@ -235,4 +235,13 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
            throw new InternalServerErrorException(e.getMessage());
        }
     }
+
+    @Override
+    public List<DocumentReview> getDocumentReviewByDepartment(UUID departmentId) {
+        try {
+            return documentReviewRepository.getAllDocumentsReviewByDepartment(departmentId);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
 }

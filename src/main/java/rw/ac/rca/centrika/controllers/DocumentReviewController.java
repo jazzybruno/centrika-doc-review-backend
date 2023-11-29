@@ -97,6 +97,16 @@ public class DocumentReviewController {
         ));
     }
 
+    @GetMapping("/received/department/{departmentId}")
+    public ResponseEntity getDocumentReviewByDepartment(@PathVariable UUID departmentId) {
+        List<DocumentReview> documentReviews = documentReviewService.getDocumentReviewByDepartment(departmentId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched the document reviews by the department",
+                documentReviews
+        ));
+    }
+
     @PostMapping("/doc/review")
     public ResponseEntity reviewTheDocument(@RequestBody ReviewDocumentDTO reviewDocumentDTO){
         DocumentReview documentReview = documentReviewService.reviewTheDocument(reviewDocumentDTO);

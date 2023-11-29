@@ -24,4 +24,6 @@ public interface DocumentReviewService {
     public List<DocumentReview> getDocumentsReviewsThatWereRequestedByUser(UUID senderId);
     public DocumentReview reviewTheDocument(ReviewDocumentDTO reviewDocumentDTO);
     public DocumentReview forwardTheDocument(ForwardDocumentDTO forwardDocumentDTO);
+
+    List<DocumentReview> getDocumentReviewByDepartment(UUID departmentId);
 }
