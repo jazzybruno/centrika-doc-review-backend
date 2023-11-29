@@ -94,4 +94,22 @@ public class DepartmentServiceImp implements DepartmentService {
             throw new InternalServerErrorException(e.getMessage());
         }
     }
+
+    @Override
+    public Department addDepartmentHead(UUID deptId, UUID userId) {
+        Department department = departmentRepository.findById(deptId).orElseThrow(()-> {throw new NotFoundException("The department was not found");
+        });
+        User user = userService.getUserById(userId);
+        if(user != null){
+            department.setDepartmentHead(user);
+            try {
+                departmentRepository.save(department);
+                return department;
+            }catch (Exception e){
+                throw new InternalServerErrorException(e.getMessage());
+            }
+        }else{
+            throw new NotFoundException("The user was not found");
+        }
+    }
 }

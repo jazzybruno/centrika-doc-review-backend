@@ -67,4 +67,15 @@ public class DepartmentController {
                 departmentService.deleteDepartment(deptId)
         ));
     }
+
+    // the department head
+
+    @PutMapping("/add-head/{deptId}/{userId}")
+    public ResponseEntity<ApiResponse> addDepartmentHead(@PathVariable UUID deptId , @PathVariable UUID userId){
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully added the department head",
+                departmentService.addDepartmentHead(deptId , userId)
+        ));
+    }
 }

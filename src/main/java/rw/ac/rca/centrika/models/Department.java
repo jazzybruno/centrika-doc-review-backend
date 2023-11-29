@@ -25,6 +25,10 @@ public class Department {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
+    @OneToOne
+    @JoinColumn(name = "department_head")
+    private User departmentHead = null;
+
     public Department(String name, String description, User createdBy) {
         this.name = name;
         this.description = description;
