@@ -65,6 +65,7 @@ public class RoleServiceImpl implements RoleService {
                roleRepository.save(role);
                return role;
            }catch (Exception e){
+               e.printStackTrace();
                throw new InternalServerErrorException(e.getMessage());
            }
         }
@@ -84,6 +85,10 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public boolean isRolePresent(EUserRole roleName) {
-        return roleRepository.findRoleByRoleName(roleName).isPresent();
+        try {
+            return roleRepository.findRoleByRoleName(roleName).isPresent();
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 }

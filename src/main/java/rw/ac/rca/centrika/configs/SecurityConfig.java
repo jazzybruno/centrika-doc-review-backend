@@ -70,6 +70,7 @@ public class SecurityConfig {
 			"/api/department/create",
 			"/api/department/update/{deptId}",
 			"/api/department/delete/{deptId}",
+			"/api/department/add-head/{deptId}/{userId}",
 			"/api/comments/**",
 			"/api/document/**",
 			"/api/document-reviews/**",

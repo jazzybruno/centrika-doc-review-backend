@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SpringBootApplication
-@ComponentScan("rw.ac.rca.centrika")
 public class CentrikaDocReview {
 	private RoleServiceImpl roleService;
 	@Autowired
