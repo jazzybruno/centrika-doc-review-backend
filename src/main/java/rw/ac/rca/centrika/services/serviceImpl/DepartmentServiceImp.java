@@ -56,7 +56,7 @@ public class DepartmentServiceImp implements DepartmentService {
                 Department department = new Department(
                         createDepartmentDTO.getName(),
                         createDepartmentDTO.getDescription(),
-                        user
+                        user.getId()
                 );
                 try {
                     departmentRepository.save(department);
@@ -114,14 +114,14 @@ public class DepartmentServiceImp implements DepartmentService {
         Set<Role> roleSet = new HashSet<Role>();
         if(department.getDepartmentHead() == null){
             if(user != null){
-                department.setDepartmentHead(user);
+                department.setDepartmentHead(user.getId());
                 roleSet.add(role);
                 user.setRoles(roleSet);
             }else{
                 throw new NotFoundException("The user was not found");
             }
         }else{
-            User head = department.getDepartmentHead();
+            User head = userService.getUserById(department.getDepartmentHead());
             if(head.getId().equals(userId)) {
                 throw new BadRequestAlertException("The user is already the department head");
             }else{
@@ -133,7 +133,7 @@ public class DepartmentServiceImp implements DepartmentService {
                 roles1.add(role);
                 user.setRoles(roles1);
 
-                department.setDepartmentHead(user);
+                department.setDepartmentHead(user.getId());
             }
         }
 

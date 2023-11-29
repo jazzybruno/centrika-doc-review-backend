@@ -36,16 +36,14 @@ public class DocumentReview {
     @OneToMany(mappedBy = "reviewDoc" , fetch = FetchType.EAGER)
     private List<Document> reviewDocList = new ArrayList<Document>();
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User creator;
+    @Column(name = "user_id")
+    private UUID creator;
 
     @Column(name = "current_doc_id")
     private UUID currentDocument;
-    @JsonIgnore
     @OneToMany(mappedBy = "documentReview" , fetch = FetchType.LAZY)
     private Set<Comment> comments = new HashSet<>();
-    public DocumentReview(Date createdAt, EDocStatus status, Set<User> reviewers , User creator ) {
+    public DocumentReview(Date createdAt, EDocStatus status, Set<User> reviewers , UUID creator ) {
         this.createdAt = createdAt;
         this.status = status;
         this.reviewers = reviewers;
