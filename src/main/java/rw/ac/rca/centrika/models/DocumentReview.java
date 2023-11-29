@@ -39,6 +39,9 @@ public class DocumentReview {
     @Column(name = "user_id")
     private UUID creator;
 
+    @Transient
+    private User creatorUser;
+
     @Column(name = "current_doc_id")
     private UUID currentDocument;
     @OneToMany(mappedBy = "documentReview" , fetch = FetchType.LAZY)

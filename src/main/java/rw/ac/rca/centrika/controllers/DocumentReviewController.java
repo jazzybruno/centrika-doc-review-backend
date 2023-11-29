@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.models.DocumentReview;
 import rw.ac.rca.centrika.services.DocumentReviewService;
-import rw.ac.rca.centrika.utils.ApResponse;
+import rw.ac.rca.centrika.services.serviceImpl.UserServiceImpl;
 import rw.ac.rca.centrika.utils.ApiResponse;
 
 import java.io.IOException;
@@ -19,14 +19,19 @@ import java.util.UUID;
 @RequestMapping("/api/document-reviews")
 public class DocumentReviewController {
     private final DocumentReviewService documentReviewService;
+    private final UserServiceImpl userService;
 
     @Autowired
-    public DocumentReviewController(DocumentReviewService documentReviewService) {
+    public DocumentReviewController(DocumentReviewService documentReviewService, UserServiceImpl userService) {
         this.documentReviewService = documentReviewService;
+        this.userService = userService;
     }
     @GetMapping
     public ResponseEntity getAllDocumentReviews() {
         List<DocumentReview> documentReviews = documentReviewService.getAllDocumentReviews();
+        documentReviews.forEach(documentReview -> {
+            documentReview.setCreatorUser(userService.getUserById(documentReview.getCreator()));
+        });
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully fetched the document reviews",
@@ -38,6 +43,9 @@ public class DocumentReviewController {
     @GetMapping("/reviewer/{reviewerId}")
     public ResponseEntity getAllDocumentReviewsByReviewer(@PathVariable UUID reviewerId) {
         List<DocumentReview> documentReviews = documentReviewService.getDocumentsReviewsThatWereRequested(reviewerId);
+        documentReviews.forEach(documentReview -> {
+            documentReview.setCreatorUser(userService.getUserById(documentReview.getCreator()));
+        });
         return ResponseEntity.ok().body(new ApiResponse(
                         true,
                         "Successfully fetched the document reviews by the reviewer",
@@ -49,6 +57,9 @@ public class DocumentReviewController {
     @GetMapping("/sender/{senderId}")
     public ResponseEntity getAllDocumentReviewsBySender(@PathVariable UUID senderId) {
         List<DocumentReview> documentReviews = documentReviewService.getDocumentsReviewsThatWereRequestedByUser(senderId);
+        documentReviews.forEach(documentReview -> {
+            documentReview.setCreatorUser(userService.getUserById(documentReview.getCreator()));
+        });
         return ResponseEntity.ok().body(new ApiResponse(
                         true,
                         "Successfully fetched the document reviews by the sender",
@@ -59,6 +70,7 @@ public class DocumentReviewController {
     @GetMapping("/{docReviewId}")
     public ResponseEntity getDocumentReviewById(@PathVariable UUID docReviewId) {
         DocumentReview documentReview = documentReviewService.getDocumentReviewById(docReviewId);
+        documentReview.setCreatorUser(userService.getUserById(documentReview.getCreator()));
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully got a review",
