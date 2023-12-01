@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.xml.crypto.Data;
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -15,7 +15,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Reviewers {
+public class Reviewer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -25,7 +25,15 @@ public class Reviewers {
     private Date createdAt;
     private Date updatedAt;
 
-    public Reviewers(User user, Date createdAt, Date updatedAt) {
+    @ManyToMany
+    @JoinTable(
+            name = "reviewer_document_review",
+            joinColumns = @JoinColumn(name = "reviewer_id"),
+            inverseJoinColumns = @JoinColumn(name = "document_review_id")
+    )
+    private Set<DocumentReview> documentReview;
+
+    public Reviewer(User user, Date createdAt, Date updatedAt) {
         this.user = user;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

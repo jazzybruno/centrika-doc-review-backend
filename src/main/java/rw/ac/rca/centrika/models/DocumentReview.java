@@ -1,16 +1,11 @@
 package rw.ac.rca.centrika.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import rw.ac.rca.centrika.enumerations.EDocStatus;
 
-import javax.print.Doc;
 import java.util.*;
 
 @Getter
@@ -49,6 +44,9 @@ public class DocumentReview {
 
     @Column(name = "updated_at")
     private Date updatedAt = null;
+
+    @ManyToMany(mappedBy = "documentReview")
+    private Set<Reviewer> reviewers = new HashSet<>();
 
     // constructor without id
     public DocumentReview(Document document, Department sendingDepartment, Department recevingDepartment, User createdBy, Date expectedCompleteTime, Date deadline, Date createdAt, Date updatedAt) {
