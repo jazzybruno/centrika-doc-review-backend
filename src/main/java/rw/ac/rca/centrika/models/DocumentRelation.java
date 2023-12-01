@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rw.ac.rca.centrika.enumerations.ERelationType;
 
 import java.util.UUID;
 
@@ -23,4 +24,13 @@ public class DocumentRelation {
     @ManyToOne
     @JoinColumn(name = "child_document_id")
     private Document childDocument;
+
+    @Enumerated(EnumType.STRING)
+    private ERelationType relationType;
+
+    public DocumentRelation(Document parentDocument, Document childDocument, ERelationType relationType) {
+        this.parentDocument = parentDocument;
+        this.childDocument = childDocument;
+        this.relationType = relationType;
+    }
 }
