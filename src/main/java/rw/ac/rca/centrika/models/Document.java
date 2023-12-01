@@ -30,18 +30,9 @@ public class Document {
    private ECategory category;
    @Enumerated(EnumType.STRING)
    private EDocStatus status;
-   private int referenceNumber;
-   @ManyToOne
-   @JsonIgnore
-   @JoinColumn(name = "document_review_id")
-   private DocumentReview reviewDoc;
    @ManyToOne
    @JoinColumn(name = "created_by")
    private User createdBy;
-   @ManyToOne
-   @JoinColumn(name = "department_id")
-   private Department department;
-
    @Column(name = "created_at")
    private Date createdAt;
    @Column(name = "updated_at")
@@ -53,9 +44,6 @@ public class Document {
       this.fileUrl = fileUrl;
       this.category = category;
       this.status = status;
-      this.referenceNumber = referenceNumber;
       this.createdBy = createdBy;
-      this.department = department;
-      this.reviewDoc = reviewDoc;
    }
 }
