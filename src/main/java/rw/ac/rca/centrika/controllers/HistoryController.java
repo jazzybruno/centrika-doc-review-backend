@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rw.ac.rca.centrika.dtos.requests.CreateHistoryDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateHistoryDTO;
-import rw.ac.rca.centrika.models.History;
 import rw.ac.rca.centrika.services.HistoryService;
 import rw.ac.rca.centrika.utils.ApResponse;
 

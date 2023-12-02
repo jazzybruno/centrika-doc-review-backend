@@ -25,13 +25,13 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User commentCreator;
     @ManyToOne
-    @JoinColumn(name = "documentReview_id")
-    private DocumentReview documentReview;
+    @JoinColumn(name = "review_action_id")
+    private ReviewAction reviewAction;
 
-    public Comment(String content, Date createdAt, User commentCreator, DocumentReview documentReview) {
+    public Comment(String content, Date createdAt, User commentCreator, ReviewAction reviewAction) {
         this.content = content;
         this.createdAt = createdAt;
         this.commentCreator = commentCreator;
-        this.documentReview = documentReview;
+        this.reviewAction = reviewAction;
     }
 }

@@ -2,7 +2,6 @@ package rw.ac.rca.centrika.services;
 
 import rw.ac.rca.centrika.dtos.requests.CreateHistoryDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateHistoryDTO;
-import rw.ac.rca.centrika.models.History;
 
 import java.util.List;
 import java.util.UUID;
