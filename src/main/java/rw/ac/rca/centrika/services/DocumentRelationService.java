@@ -17,6 +17,6 @@ public interface DocumentRelationService {
 
     // Custom Methods
        public List<DocumentRelation> getAllDocRelationsByRelationType(ERelationType relationType);
-       public List<DocumentRelation> getAllDocVersionRelations(UUID documentId);
-        public List<DocumentRelation> getAllDocResponseRelations(UUID documentId);
+       public List<DocumentRelation> getAllDocRelationByParentDoc(UUID documentId);
+        public List<DocumentRelation> getAllDocRelationByChildDocument(UUID documentId);
 }
