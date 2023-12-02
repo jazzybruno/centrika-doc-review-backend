@@ -12,7 +12,7 @@ import rw.ac.rca.centrika.models.Message;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.repositories.GroupRepository;
 import rw.ac.rca.centrika.repositories.IUserRepository;
-import rw.ac.rca.centrika.repositories.MessageRepository;
+import rw.ac.rca.centrika.repositories.IMessageRepository;
 import rw.ac.rca.centrika.services.MessageService;
 
 import java.util.Date;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
     private IUserRepository userRepository;
-    private MessageRepository messageRepository;
+    private IMessageRepository messageRepository;
     private GroupRepository groupRepository;
     public final String internalServerErrorMessage = "Failed try again!!";
     @Override

@@ -5,5 +5,5 @@ import rw.ac.rca.centrika.models.ReviewAction;
 
 import java.util.UUID;
 
-public interface ReviewActionRepository extends JpaRepository<ReviewAction, UUID> {
+public interface IReviewActionRepository extends JpaRepository<ReviewAction, UUID> {
 }

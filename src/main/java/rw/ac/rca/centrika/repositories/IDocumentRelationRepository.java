@@ -5,5 +5,5 @@ import rw.ac.rca.centrika.models.DocumentRelation;
 
 import java.util.UUID;
 
-public interface DocumentRelationRepository extends JpaRepository<DocumentRelation, UUID> {
+public interface IDocumentRelationRepository extends JpaRepository<DocumentRelation, UUID> {
 }

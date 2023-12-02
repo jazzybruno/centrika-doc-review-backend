@@ -5,5 +5,5 @@ import rw.ac.rca.centrika.models.DepartmentHead;
 
 import java.util.UUID;
 
-public interface DepartmentHeadRepository extends JpaRepository<DepartmentHead, UUID> {
+public interface IDepartmentHeadRepository extends JpaRepository<DepartmentHead, UUID> {
 }
