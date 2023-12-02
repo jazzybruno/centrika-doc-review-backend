@@ -22,6 +22,7 @@ public class ReferenceNumber {
     private UUID id;
     private String referenceNumber;
     private String title;
+    private String destination;
     private Date createdAt;
     @Enumerated(EnumType.STRING)
     private ERefNumStatus status;
