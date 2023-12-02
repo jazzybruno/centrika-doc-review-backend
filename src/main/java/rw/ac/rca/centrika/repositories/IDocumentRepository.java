@@ -12,6 +12,5 @@ import java.util.UUID;
 
 public interface IDocumentRepository extends JpaRepository<Document, UUID> {
     public List<Document> findAllByCreatedBy(User user);
-    public List<Document> findAllByDepartment(Department  department);
     public List<Document> findAllByCategory(ECategory category);
 }

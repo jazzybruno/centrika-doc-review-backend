@@ -10,7 +10,6 @@ import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.Document;
 import rw.ac.rca.centrika.models.DocumentReview;
 import rw.ac.rca.centrika.models.User;
-import rw.ac.rca.centrika.repositories.IHistoryRepository;
 import rw.ac.rca.centrika.services.HistoryService;
 
 import java.util.List;
