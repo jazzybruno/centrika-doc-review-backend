@@ -25,9 +25,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+
+    // primary key
     @Id
     @GeneratedValue (strategy = GenerationType.UUID)
     private UUID id;
+
+    // personal details
     private String username;
     @Column(name = "phone_number")
     private String phoneNumber;
@@ -35,6 +39,18 @@ public class User {
     private String email;
     @Enumerated(EnumType.STRING)
     private EGender gender;
+
+    // Time Stamp details
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at")
+    private Date createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_at")
+    private Date updatedAt;
+
+    // authentication details
+    @Column(name = "activation_code")
+    private String activationCode;
     @JsonIgnore
     @Column(name = "password")
     @NotBlank (message = "Password is required")
@@ -44,17 +60,12 @@ public class User {
     private EStatus status;
     @Column(name = "verified")
     private boolean verified;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at")
-    private Date createdAt;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at")
-    private Date updatedAt;
-    @Column(name = "activation_code")
-    private String activationCode;
-    // Define the many-to-one relationship with department
+
     @Column
     private String token;
+
+    // Relationships details
+
     @ManyToOne
     @JoinColumn(name = "department_id")
     private Department department;

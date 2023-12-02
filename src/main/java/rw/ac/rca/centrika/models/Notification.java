@@ -19,15 +19,20 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID notId;
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "sender_id")
+    private User sender;
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
     private String message;
     private boolean isRead;
     private Date createdAt;
 
-    public Notification(User user, String message, boolean isRead) {
-        this.user = user;
-        this.message = message;
-        this.isRead = isRead;
-    }
+      public Notification(User sender, User receiver, String message) {
+            this.sender = sender;
+            this.receiver = receiver;
+            this.message = message;
+            this.isRead = false;
+            this.createdAt = new Date();
+        }
 }
