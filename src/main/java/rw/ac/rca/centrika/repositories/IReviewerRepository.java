@@ -5,5 +5,5 @@ import rw.ac.rca.centrika.models.Reviewer;
 
 import java.util.UUID;
 
-public interface ReviewerRepository extends JpaRepository<Reviewer, UUID> {
+public interface IReviewerRepository extends JpaRepository<Reviewer, UUID> {
 }

@@ -19,9 +19,5 @@ public interface DocumentService {
     public Document updatedocument(UUID doc_id , UpdateDocumentDTO updateDocumentDTO);
     public Document updateDocFile(UUID docId ,  MultipartFile docFile);
     public Document deleteDocument(UUID doc_id );
-    public Document approveDocument(UUID doc_id);
-//    public Document rejectDocument(UUID doc_id);
 
-    // Other method other usages
-    public int getReferenceNumber();
 }

@@ -13,17 +13,13 @@ public interface DocumentReviewService {
     // CRUD methods
     public List<DocumentReview> getAllDocumentReviews();
     public DocumentReview getDocumentReviewById(UUID docReviewId);
-
     DocumentReview requestDocumentReview(MultipartFile file,  RequestReviewDTO requestReviewDTO) throws IOException;
-
     public DocumentReview updateDocumentReview(MultipartFile file , UUID docReviewId , UpdateDocumentReviewDTO updateDocumentReviewDTO) ;
     public DocumentReview deleteDocumentReview(UUID docReviewId);
     // other methods
-
-    public List<DocumentReview> getDocumentsReviewsThatWereRequested(UUID reviewerId);
-    public List<DocumentReview> getDocumentsReviewsThatWereRequestedByUser(UUID senderId);
-    public DocumentReview reviewTheDocument(ReviewDocumentDTO reviewDocumentDTO);
+    public List<DocumentReview> getDocumentReviewByCreator(UUID creatorId);
     public DocumentReview forwardTheDocument(ForwardDocumentDTO forwardDocumentDTO);
-
-    List<DocumentReview> getDocumentReviewByDepartment(UUID departmentId);
+    List<DocumentReview> findDocumentReviewByDocumentId(UUID documentId);
+    List<DocumentReview> getDocumentReviewBySenderDepartment(UUID senderDepartmentId);
+    List<DocumentReview> getDocumentReviewByReceiverDepartment(UUID receiverDepartmentId);
 }

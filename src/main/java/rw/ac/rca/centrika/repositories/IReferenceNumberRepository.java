@@ -5,5 +5,5 @@ import rw.ac.rca.centrika.models.ReferenceNumber;
 
 import java.util.UUID;
 
-public interface ReferenceNumberRepository extends JpaRepository<ReferenceNumber, UUID> {
+public interface IReferenceNumberRepository extends JpaRepository<ReferenceNumber, UUID> {
 }
