@@ -53,7 +53,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Role createRole(EUserRole roleName) {
+    public void createRole(EUserRole roleName) {
         Optional<Role> optionalRole = roleRepository.findRoleByRoleName(roleName);
         if(optionalRole.isPresent()){
             throw new BadRequestAlertException("The role already exists");
@@ -63,7 +63,6 @@ public class RoleServiceImpl implements RoleService {
             );
            try {
                roleRepository.save(role);
-               return role;
            }catch (Exception e){
                e.printStackTrace();
                throw new InternalServerErrorException(e.getMessage());

@@ -10,7 +10,7 @@ public interface RoleService {
     public List<Role> getAllRoles();
     public Role getRoleById(UUID roleId);
     public  Role getRoleByName(EUserRole roleName);
-    public Role createRole(EUserRole roleName);
+    public void createRole(EUserRole roleName);
     public Role deleteRole(UUID roleId);
     public boolean isRolePresent(EUserRole roleName);
 }
