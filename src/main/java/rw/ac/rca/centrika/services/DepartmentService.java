@@ -13,8 +13,4 @@ public interface DepartmentService {
     public Department createDepartment(CreateDepartmentDTO createDepartmentDTO);
     public Department updateDepartment(UUID deptId , UpdateDepartmentDTO updateDepartment);
     public Department deleteDepartment(UUID deptId);
-
-    // adding a department head
-    public Department addDepartmentHead(UUID deptId , UUID userId);
-
 }
