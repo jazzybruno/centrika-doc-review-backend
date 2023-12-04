@@ -17,6 +17,7 @@ import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.services.DocumentReviewService;
 
+import javax.print.Doc;
 import java.io.IOException;
 import java.util.*;
 
@@ -50,55 +51,47 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
 
     @Override
     @Transactional
-    public DocumentReview requestDocumentReview(MultipartFile file,  RequestReviewDTO requestReviewDTO) throws IOException {
-        if(requestReviewDTO.getCreator().equals(requestReviewDTO.getReviewer())){
-            throw new BadRequestAlertException("Failed , The user can not review his or her document");
+    public DocumentReview requestDocumentReview(RequestReviewDTO requestReviewDTO) throws IOException {
+        Document document = documentService.getDocumentById(requestReviewDTO.getDocumentId());
+        User createdBy = userService.getUserById(requestReviewDTO.getCreatedBy());
+        Department sendingDepartment = createdBy.getDepartment();
+        Date createdAt = new Date();
+        Date expectedCompleteTime = requestReviewDTO.getExpectedCompleteTime();
+        Date deadline = null;
+        if (expectedCompleteTime != null){
+            deadline = new Date(expectedCompleteTime.getTime() - 86400000);
         }
-        User user = userService.getUserById(requestReviewDTO.getReviewer());
-        User user1 = userService.getUserById(requestReviewDTO.getCreator());
+        DocumentReview documentReview = new DocumentReview(
+                document,
+                sendingDepartment,
+                createdBy,
+                expectedCompleteTime,
+                deadline,
+                createdAt,
+                null
+        );
+
         try {
-            EDocStatus status=EDocStatus.PENDING;
-            Date createdAt = new Date();
-           Set<User> reviewers = new HashSet<User>();
-           reviewers.add(user);
-           DocumentReview documentReview = new DocumentReview(
-                   createdAt,
-                   status,
-                   reviewers,
-                   user1.getId()
-           );
-           String message =  "You have a new document review requested from: " +  user1.getUsername();
-            Notification notification = new Notification(
-                    user,
-                    message,
-                    false
-            );
-            Date date = new Date();
-            notification.setCreatedAt(date);
-            notificationRepository.save(notification);
             DocumentReview review = documentReviewRepository.save(documentReview);
-            if(review.getId() == null){
-                throw new InternalServerErrorException("Failed to create the document review");
+            for (UUID user : requestReviewDTO.getReviewers()) {
+                User user1 = userService.getUserById(user);
+                String message = "You have a new document review from: " + createdBy.getUsername();
+                Notification notification = new Notification(
+                        createdBy,
+                        user1,
+                        message
+                );
+                notificationRepository.save(notification);
             }
-            CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
-                    requestReviewDTO.getTitle(),
-                    requestReviewDTO.getDescription(),
-                    requestReviewDTO.getCategory(),
-                    requestReviewDTO.getDepartmentId(),
-                    requestReviewDTO.getCreator(),
-                    review.getId()
-            );
-            Document document = documentService.createDocument(file , createDocumentDTO);
-            documentReview.setCurrentDocument(document.getId());
-           return documentReview;
-        }catch (Exception e){
-            throw new InternalServerErrorException(e.getMessage());
-        }
+            return documentReview;
+            }catch (Exception e){
+                throw new InternalServerErrorException(e.getMessage());
+            }
     }
 
     @Override
     @Transactional
-    public DocumentReview updateDocumentReview(MultipartFile file ,  UUID docReviewId, UpdateDocumentReviewDTO updateDocumentReviewDTO) {
+    public DocumentReview updateDocumentReview(UUID docReviewId, UpdateDocumentReviewDTO updateDocumentReviewDTO) {
         DocumentReview documentReview = documentReviewRepository.findById(docReviewId).orElseThrow(() -> {throw new NotFoundException("The document Review was not found");
         });
         User user = userService.getUserById(updateDocumentReviewDTO.getReviewer());
@@ -146,66 +139,11 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     }
 
     @Override
-    public List<DocumentReview> getDocumentsReviewsThatWereRequested(UUID reviewerId) {
-        try {
-            return documentReviewRepository.getAllDocumentsReviewByReviewer(reviewerId);
-        }catch (Exception e){
-            throw new InternalServerErrorException(e.getMessage());
-        }
+    public List<DocumentReview> getDocumentReviewByCreator(UUID creatorId) {
+        return null;
     }
 
-    @Override
-    public List<DocumentReview> getDocumentsReviewsThatWereRequestedByUser(UUID senderId) {
-        try {
-            return documentReviewRepository.getAllDocumentsReviewByCreator(senderId);
-        }catch (Exception e){
-            throw new InternalServerErrorException(e.getMessage());
-        }
-    }
 
-    @Override
-    @Transactional
-    public DocumentReview reviewTheDocument(ReviewDocumentDTO reviewDocumentDTO) {
-        DocumentReview documentReview = this.getDocumentReviewById(reviewDocumentDTO.getReviewDocId());
-        User user = userService.getUserById(reviewDocumentDTO.getReviewer());
-        String rejectNotificationMessage = "The Document was rejected by: " + user.getUsername() + " check the comments to fix the document";
-        String approveNotificationMessage = "The Document was approved by: " + user.getUsername();
-        Notification notification = new Notification();
-        Comment comment = new Comment(
-           reviewDocumentDTO.getCommentContent(),
-                new Date(),
-                user,
-                documentReview
-        );
-        Document currentDocument = documentService.getDocumentById(documentReview.getCurrentDocument());
-          try {
-              if(reviewDocumentDTO.getStatus().equals(EReviewStatus.REJECT)){
-                  currentDocument.setStatus(EDocStatus.REJECTED);
-                  documentReview.setStatus(EDocStatus.REJECTED);
-                  notification.setCreatedAt(new Date());
-                  notification.setUser(currentDocument.getCreatedBy());
-                  notification.setMessage(rejectNotificationMessage);
-                  notification.setRead(false);
-                  notificationRepository.save(notification);
-                  commentRepository.save(comment);
-              }else if (reviewDocumentDTO.getStatus().equals(EReviewStatus.APPROVE)){
-                  currentDocument.setStatus(EDocStatus.APPROVED);
-                  documentReview.setStatus(EDocStatus.APPROVED);
-                  notification.setCreatedAt(new Date());
-                  notification.setUser(currentDocument.getCreatedBy());
-                  notification.setMessage(approveNotificationMessage);
-                  notification.setRead(false);
-                  notificationRepository.save(notification);
-                  commentRepository.save(comment);
-              }else{
-                  throw new BadRequestAlertException("The status must be REJECT or APPROVE");
-              }
-              return documentReview;
-          }catch (Exception e){
-              e.printStackTrace();
-              throw new InternalServerErrorException(e.getMessage());
-          }
-    }
 
     @Override
     public DocumentReview forwardTheDocument(ForwardDocumentDTO forwardDocumentDTO) {
@@ -237,11 +175,18 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     }
 
     @Override
-    public List<DocumentReview> getDocumentReviewByDepartment(UUID departmentId) {
-        try {
-            return documentReviewRepository.getAllDocumentsReviewByDepartment(departmentId);
-        }catch (Exception e){
-            throw new InternalServerErrorException(e.getMessage());
-        }
+    public List<DocumentReview> findDocumentReviewByDocumentId(UUID documentId) {
+        return null;
     }
+
+    @Override
+    public List<DocumentReview> getDocumentReviewBySenderDepartment(UUID senderDepartmentId) {
+        return null;
+    }
+
+    @Override
+    public List<DocumentReview> getDocumentReviewByReceiverDepartment(UUID receiverDepartmentId) {
+        return null;
+    }
+
 }

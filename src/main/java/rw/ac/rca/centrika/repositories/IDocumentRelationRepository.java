@@ -10,6 +10,6 @@ import java.util.UUID;
 
 public interface IDocumentRelationRepository extends JpaRepository<DocumentRelation, UUID> {
     List<DocumentRelation> findAllByRelationType(ERelationType relationType);
-    List<DocumentRelation> findAllByParentDocumentId(Document documentId);
-    List<DocumentRelation> findAllByChildDocumentId(Document documentId);
+    List<DocumentRelation> findAllByParentDocument(Document documentId);
+    List<DocumentRelation> findAllByChildDocument(Document documentId);
 }

@@ -102,7 +102,7 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     public List<DocumentRelation> getAllDocRelationByParentDoc(UUID documentId) {
         Document document = documentRepository.findById(documentId).orElseThrow(() -> new InternalServerErrorException("Document not found"));
         try {
-            return documentRelationRepository.findAllByParentDocumentId(document);
+            return documentRelationRepository.findAllByParentDocument(document);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -112,7 +112,7 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     public List<DocumentRelation> getAllDocRelationByChildDocument(UUID documentId) {
         Document document = documentRepository.findById(documentId).orElseThrow(() -> new InternalServerErrorException("Document not found"));
         try {
-            return documentRelationRepository.findAllByChildDocumentId(document);
+            return documentRelationRepository.findAllByChildDocument(document);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }

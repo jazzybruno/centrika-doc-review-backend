@@ -25,9 +25,6 @@ public class DocumentReview {
     @ManyToOne
     @JoinColumn(name = "sending_department_id")
     private Department sendingDepartment;
-    @ManyToOne
-    @JoinColumn(name = "receiving_department_id")
-    private Department recevingDepartment;
 
     @ManyToOne
     @JoinColumn(name = "created_by")
@@ -45,14 +42,10 @@ public class DocumentReview {
     @Column(name = "updated_at")
     private Date updatedAt = null;
 
-    @ManyToMany(mappedBy = "documentReview")
-    private Set<Reviewer> reviewers = new HashSet<>();
-
     // constructor without id
-    public DocumentReview(Document document, Department sendingDepartment, Department recevingDepartment, User createdBy, Date expectedCompleteTime, Date deadline, Date createdAt, Date updatedAt) {
+    public DocumentReview(Document document, Department sendingDepartment, User createdBy, Date expectedCompleteTime, Date deadline, Date createdAt, Date updatedAt) {
         this.document = document;
         this.sendingDepartment = sendingDepartment;
-        this.recevingDepartment = recevingDepartment;
         this.createdBy = createdBy;
         this.expectedCompleteTime = expectedCompleteTime;
         this.deadline = deadline;

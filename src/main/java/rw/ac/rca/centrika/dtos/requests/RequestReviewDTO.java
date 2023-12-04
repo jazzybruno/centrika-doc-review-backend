@@ -9,6 +9,8 @@ import lombok.Setter;
 import rw.ac.rca.centrika.enumerations.ECategory;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
 
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,12 +18,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestReviewDTO {
-    private String title;
-    private String description;
-    @Enumerated(EnumType.STRING)
-    private ECategory category;
-    private UUID departmentId;
-    public UUID reviewer;
-    public UUID creator;
+
+    public UUID documentId;
+    public UUID createdBy;
+    public Date expectedCompleteTime;
+    public List<UUID> reviewers;
 
 }
