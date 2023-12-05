@@ -11,6 +11,7 @@ import rw.ac.rca.centrika.models.Department;
 import rw.ac.rca.centrika.models.User;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,8 +24,6 @@ public class CreateDocumentDTO {
     private String description;
     @Enumerated(EnumType.STRING)
     private ECategory category;
-    private UUID departmentId;
     private UUID creator;
-    private UUID docReviewId;
-
+    private Optional<UUID> referenceNumberId;
 }
