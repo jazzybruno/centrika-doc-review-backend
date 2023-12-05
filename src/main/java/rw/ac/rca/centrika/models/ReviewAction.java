@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
+import rw.ac.rca.centrika.enumerations.EReviewStatus;
 
 import java.util.Date;
 import java.util.UUID;
@@ -28,13 +29,13 @@ public class ReviewAction {
     private DocumentReview documentReview;
 
     @Enumerated(EnumType.STRING)
-    private EDocStatus action;
+    private EReviewStatus action;
 
     private Date createdAt;
 
     private Date updatedAt;
 
-    public ReviewAction(Reviewer reviewer, DocumentReview documentReview, EDocStatus action, Date createdAt, Date updatedAt) {
+    public ReviewAction(Reviewer reviewer, DocumentReview documentReview, EReviewStatus action, Date createdAt, Date updatedAt) {
         this.reviewer = reviewer;
         this.documentReview = documentReview;
         this.action = action;

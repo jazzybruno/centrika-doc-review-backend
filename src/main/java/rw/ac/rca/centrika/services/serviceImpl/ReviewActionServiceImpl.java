@@ -1,75 +1,194 @@
 package rw.ac.rca.centrika.services.serviceImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import rw.ac.rca.centrika.dtos.CreateReviewActionDTO;
-import rw.ac.rca.centrika.models.ReviewAction;
-import rw.ac.rca.centrika.services.ReviewActionService;
+import rw.ac.rca.centrika.dtos.UpdateReviewActionDTO;
+import rw.ac.rca.centrika.enumerations.EReviewStatus;
+import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
+import rw.ac.rca.centrika.models.*;
+import rw.ac.rca.centrika.repositories.ICommentRepository;
+import rw.ac.rca.centrika.repositories.IReviewActionRepository;
+import rw.ac.rca.centrika.repositories.IReviewerRepository;
+import rw.ac.rca.centrika.services.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class ReviewActionServiceImpl  implements ReviewActionService {
+    private IReviewActionRepository reviewActionRepository;
+    private ReviewerService reviewerService;
+    private UserService userService;
+    private DocumentReviewServiceImpl documentReviewService;
+    private DocumentService documentService;
+    private ICommentRepository commentRepository;
+
+    @Autowired
+    public ReviewActionServiceImpl(IReviewActionRepository reviewActionRepository , ICommentRepository commentRepository, ReviewerService reviewerService, UserService userService, DocumentReviewServiceImpl documentReviewService, DocumentService documentService) {
+        this.reviewActionRepository = reviewActionRepository;
+        this.reviewerService = reviewerService;
+        this.userService = userService;
+        this.documentReviewService = documentReviewService;
+        this.documentService = documentService;
+        this.commentRepository = commentRepository;
+    }
+
     @Override
     public List<ReviewAction> findAll() {
-        return null;
+        try {
+            return reviewActionRepository.findAll();
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public ReviewAction findById(UUID reviewActionId) {
-        return null;
+        try {
+            return reviewActionRepository.findById(reviewActionId).orElseThrow(() -> {throw new InternalServerErrorException("The review action was not found");
+            });
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public ReviewAction save(CreateReviewActionDTO reviewActionDTO) {
-        return null;
+        Reviewer reviewer = reviewerService.findReviewerById(reviewActionDTO.getReviewerId());
+        DocumentReview documentReview = documentReviewService.getDocumentReviewById(reviewActionDTO.getDocumentReviewId());
+        ReviewAction reviewAction = new ReviewAction();
+        reviewAction.setReviewer(reviewer);
+        reviewAction.setDocumentReview(documentReview);
+        reviewAction.setAction(reviewActionDTO.getAction());
+
+        try {
+            ReviewAction action =  reviewActionRepository.save(reviewAction);
+            // Creat the comment
+            Comment comment = new Comment();
+            comment.setContent(reviewActionDTO.getComment());
+            comment.setReviewAction(action);
+            comment.setCommentCreator(reviewer.getUser());
+            comment.setCreatedAt(new Date());
+            commentRepository.save(comment);
+
+            return action;
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
-    public ReviewAction update(UUID reviewActionId, CreateReviewActionDTO reviewActionDTO) {
-        return null;
+    public ReviewAction update(UUID reviewActionId, UpdateReviewActionDTO updateReviewActionDTO) {
+        ReviewAction reviewAction = findById(reviewActionId);
+        reviewAction.setAction(updateReviewActionDTO.getAction());
+        reviewAction.setUpdatedAt(new Date());
+        try {
+            // Creat the comment
+            Comment comment = new Comment();
+            comment.setContent(updateReviewActionDTO.getComment());
+            comment.setReviewAction(reviewAction);
+            comment.setCommentCreator(reviewAction.getReviewer().getUser());
+            comment.setCreatedAt(new Date());
+            commentRepository.save(comment);
+
+            return reviewActionRepository.save(reviewAction);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public void delete(UUID reviewActionId) {
-
+        ReviewAction action = findById(reviewActionId);
+        try {
+            reviewActionRepository.deleteById(reviewActionId);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public List<ReviewAction> findByReviewerId(UUID reviewerId) {
-        return null;
+        Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
+        try {
+              return reviewActionRepository.findAllByReviewer(reviewer);
+        }catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public List<ReviewAction> findByDocumentId(UUID documentId) {
-        return null;
+        Document document = documentService.getDocumentById(documentId);
+        try {
+           return reviewActionRepository.findAllByDocument(document);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public List<ReviewAction> findByReviewerIdAndDocumentId(UUID reviewerId, UUID documentId) {
-        return null;
+        Document document = documentService.getDocumentById(documentId);
+        Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
+        try {
+            return reviewActionRepository.findAllByReviewerAndDocument(reviewer ,  document);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
-    public List<ReviewAction> findByReviewerIdAndDocumentIdAndStatus(UUID reviewerId, UUID documentId, String status) {
-        return null;
+    public List<ReviewAction> findByReviewerIdAndDocumentIdAndStatus(UUID reviewerId, UUID documentId, EReviewStatus status) {
+        Document document = documentService.getDocumentById(documentId);
+        Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
+        try {
+            return reviewActionRepository.findAllByReviewerAndDocumentStatus(reviewer ,  document , status);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
-    public List<ReviewAction> findByReviewerIdAndStatus(UUID reviewerId, String status) {
-        return null;
+    public List<ReviewAction> findByReviewerIdAndStatus(UUID reviewerId, EReviewStatus status) {
+        Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
+        try {
+            return reviewActionRepository.findAllByReviewerAndAction(reviewer , status);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public List<ReviewAction> findByDocumentReviewId(UUID documentReviewId) {
-        return null;
+        DocumentReview document_review = documentReviewService.getDocumentReviewById(documentReviewId);
+        try {
+            return reviewActionRepository.findAllByDocumentReview(document_review);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
-    public List<ReviewAction> findByDocumentReviewIdAndStatus(UUID documentReviewId, String status) {
-        return null;
+    public List<ReviewAction> findByDocumentReviewIdAndStatus(UUID documentReviewId, EReviewStatus status) {
+        DocumentReview document_review = documentReviewService.getDocumentReviewById(documentReviewId);
+        try {
+            return reviewActionRepository.findAllByDocumentReviewAndAction(document_review , status);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public List<ReviewAction> findByDocumentReviewIdAndReviewerId(UUID documentReviewId, UUID reviewerId) {
-        return null;
+        DocumentReview document_review = documentReviewService.getDocumentReviewById(documentReviewId);
+        Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
+        try {
+            return reviewActionRepository.findAllByDocumentReviewAndReviewer(document_review , reviewer);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 }

@@ -12,9 +12,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateReviewActionDTO {
-    private UUID reviewerId;
-    private UUID documentReviewId;
+public class UpdateReviewActionDTO {
     private EReviewStatus action;
     private String comment;
 
