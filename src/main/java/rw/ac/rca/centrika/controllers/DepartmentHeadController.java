@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rw.ac.rca.centrika.dtos.CreateDepartmentHeadDTO;
+import rw.ac.rca.centrika.dtos.UpdateDepartmentHeadDTO;
 import rw.ac.rca.centrika.models.DepartmentHead;
 import rw.ac.rca.centrika.services.DepartmentHeadService;
 import rw.ac.rca.centrika.utils.ApiResponse;
@@ -54,7 +55,7 @@ public class DepartmentHeadController {
     }
 
     @PutMapping("/{departmentHeadId}")
-    public ResponseEntity updateDepartmentHead(@PathVariable UUID departmentHeadId, @RequestBody CreateDepartmentHeadDTO departmentHeadDTO) {
+    public ResponseEntity updateDepartmentHead(@PathVariable UUID departmentHeadId, @RequestBody UpdateDepartmentHeadDTO departmentHeadDTO) {
         DepartmentHead departmentHead = departmentHeadService.updateDepartmentHead(departmentHeadId, departmentHeadDTO);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,

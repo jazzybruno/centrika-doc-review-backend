@@ -4,17 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rw.ac.rca.centrika.dtos.CreateDepartmentHeadDTO;
+import rw.ac.rca.centrika.dtos.UpdateDepartmentHeadDTO;
+import rw.ac.rca.centrika.enumerations.EUserRole;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.Department;
 import rw.ac.rca.centrika.models.DepartmentHead;
+import rw.ac.rca.centrika.models.Role;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.repositories.IDepartmentHeadRepository;
 import rw.ac.rca.centrika.repositories.IDepartmentRepository;
 import rw.ac.rca.centrika.repositories.IUserRepository;
 import rw.ac.rca.centrika.services.DepartmentHeadService;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -25,11 +30,13 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
     private IDepartmentRepository departmentRepository;
     private DepartmentHead departmentHead;
     private List<DepartmentHead> departmentHeads;
+    private RoleServiceImpl roleService;
 
-    public DepartmentHeadServiceImpl(IDepartmentHeadRepository departmentHeadRepository, IUserRepository userRepository, IDepartmentRepository departmentRepository) {
+    public DepartmentHeadServiceImpl(RoleServiceImpl roleService , IDepartmentHeadRepository departmentHeadRepository, IUserRepository userRepository, IDepartmentRepository departmentRepository) {
         this.departmentHeadRepository = departmentHeadRepository;
         this.userRepository = userRepository;
         this.departmentRepository = departmentRepository;
+        this.roleService = roleService;
     }
 
     @Override
@@ -57,6 +64,10 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
         departmentHead = new DepartmentHead();
         departmentHead.setDepartmentId(department);
         departmentHead.setUserId(user);
+        Role role = roleService.getRoleByName(EUserRole.DEPARTMENT_HEAD);
+        Set<Role> roles = new HashSet<Role>();
+        roles.add(role);
+        user.setRoles(roles);
         try {
             return departmentHeadRepository.save(departmentHead);
         }catch (Exception e){
@@ -66,11 +77,25 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
 
     @Override
     @Transactional
-    public DepartmentHead updateDepartmentHead(UUID departmentHeadId, CreateDepartmentHeadDTO departmentHeadDTO) {
+    public DepartmentHead updateDepartmentHead(UUID departmentHeadId, UpdateDepartmentHeadDTO departmentHeadDTO) {
         departmentHead = getDepartmentHeadById(departmentHeadId);
         try {
         Department department = departmentRepository.findById(departmentHeadDTO.getDepartmentId()).orElseThrow(() -> new NotFoundException("Department not found"));
         User user = userRepository.findById(departmentHeadDTO.getUserId()).orElseThrow(() -> new NotFoundException("User not found"));
+        User usualDeptHead = departmentHead.getUserId();
+
+            Role user_role = roleService.getRoleByName(EUserRole.USER);
+            Set<Role> roles_user = new HashSet<Role>();
+            roles_user.add(user_role);
+            user.setRoles(roles_user);
+            usualDeptHead.setRoles(roles_user);
+
+            Role role = roleService.getRoleByName(EUserRole.DEPARTMENT_HEAD);
+            Set<Role> roles = new HashSet<Role>();
+            roles.add(role);
+            user.setRoles(roles);
+            user.setRoles(roles);
+
         departmentHead.setDepartmentId(department);
         departmentHead.setUserId(user);
         return departmentHead;

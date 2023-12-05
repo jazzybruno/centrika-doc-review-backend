@@ -36,17 +36,7 @@ public class DepartmentServiceImp implements DepartmentService {
     }
     @Override
     public List<Department> getAllDepartments() {
-        List<Department> departments = departmentRepository.findAll();
-        if(departments.isEmpty()){
-            throw new NotFoundException("No departments found");
-        }
-        departments.forEach(department -> {
-            if(department.getCreatedBy() != null){
-                User user = userService.getUserById(department.getCreatedBy());
-                department.setCreatedByUser(user);
-            }
-        });
-        return departments;
+        return departmentRepository.findAll();
     }
 
     @Override
@@ -66,7 +56,7 @@ public class DepartmentServiceImp implements DepartmentService {
                 Department department = new Department(
                         createDepartmentDTO.getName(),
                         createDepartmentDTO.getDescription(),
-                        user.getId()
+                        user
                 );
                 try {
                     departmentRepository.save(department);

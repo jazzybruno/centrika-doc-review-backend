@@ -1,6 +1,7 @@
 package rw.ac.rca.centrika.services;
 
 import rw.ac.rca.centrika.dtos.CreateDepartmentHeadDTO;
+import rw.ac.rca.centrika.dtos.UpdateDepartmentHeadDTO;
 import rw.ac.rca.centrika.models.DepartmentHead;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public interface DepartmentHeadService {
     public List<DepartmentHead> getAllDepartmentHeads();
     public DepartmentHead getDepartmentHeadById(UUID departmentHeadId);
     public DepartmentHead createDepartmentHead(CreateDepartmentHeadDTO departmentHeadDTO);
-    public DepartmentHead updateDepartmentHead(UUID departmentHeadId, CreateDepartmentHeadDTO departmentHeadDTO);
+    public DepartmentHead updateDepartmentHead(UUID departmentHeadId, UpdateDepartmentHeadDTO departmentHeadDTO);
     public DepartmentHead deleteDepartmentHead(UUID departmentHeadId);
 
     // Custom Methods
