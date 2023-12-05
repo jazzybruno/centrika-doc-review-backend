@@ -50,4 +50,5 @@ public class Document {
       this.status = status;
       this.createdBy = createdBy;
    }
+
 }
