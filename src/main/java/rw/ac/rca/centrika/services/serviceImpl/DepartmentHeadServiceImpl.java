@@ -1,6 +1,7 @@
 package rw.ac.rca.centrika.services.serviceImpl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rw.ac.rca.centrika.dtos.CreateDepartmentHeadDTO;
@@ -32,6 +33,7 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
     private List<DepartmentHead> departmentHeads;
     private RoleServiceImpl roleService;
 
+    @Autowired
     public DepartmentHeadServiceImpl(RoleServiceImpl roleService , IDepartmentHeadRepository departmentHeadRepository, IUserRepository userRepository, IDepartmentRepository departmentRepository) {
         this.departmentHeadRepository = departmentHeadRepository;
         this.userRepository = userRepository;
@@ -44,7 +46,7 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
         try {
             return departmentHeadRepository.findAll();
         }catch (Exception e){
-            throw new InternalServerErrorException("Error while getting all department heads");
+            throw new InternalServerErrorException(e.getMessage());
         }
     }
 
