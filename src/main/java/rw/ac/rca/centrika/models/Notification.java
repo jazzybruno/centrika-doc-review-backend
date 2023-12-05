@@ -25,14 +25,14 @@ public class Notification {
     @JoinColumn(name = "receiver_id")
     private User receiver;
     private String message;
-    private boolean isRead;
+    private boolean read;
     private Date createdAt;
 
       public Notification(User sender, User receiver, String message) {
             this.sender = sender;
             this.receiver = receiver;
             this.message = message;
-            this.isRead = false;
+            this.read = false;
             this.createdAt = new Date();
         }
 }

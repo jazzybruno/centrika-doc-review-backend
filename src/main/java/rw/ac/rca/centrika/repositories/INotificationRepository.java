@@ -12,9 +12,7 @@ import java.util.UUID;
 public interface INotificationRepository extends JpaRepository<Notification, UUID> {
     List<Notification> findAllBySender(User user);
     List<Notification> findAllByReceiver(User user);
-
     List<Notification> findAllBySenderAndRead(User user , boolean isRead);
     List<Notification> findAllByReceiverAndRead(User user , boolean isRead);
-
 
 }

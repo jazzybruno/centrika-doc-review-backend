@@ -6,8 +6,10 @@ import rw.ac.rca.centrika.dtos.CreateReviewActionDTO;
 import rw.ac.rca.centrika.dtos.UpdateReviewActionDTO;
 import rw.ac.rca.centrika.enumerations.EReviewStatus;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
+import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.*;
 import rw.ac.rca.centrika.repositories.ICommentRepository;
+import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.repositories.IReviewActionRepository;
 import rw.ac.rca.centrika.services.*;
@@ -21,17 +23,17 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
     private IReviewActionRepository reviewActionRepository;
     private ReviewerService reviewerService;
     private UserService userService;
-    private DocumentReviewServiceImpl documentReviewService;
+    private IDocumentReviewRepository documentReviewRepository;
     private DocumentService documentService;
     private ICommentRepository commentRepository;
     private INotificationRepository notificationRepository;
 
     @Autowired
-    public ReviewActionServiceImpl(INotificationRepository notificationRepository , IReviewActionRepository reviewActionRepository , ICommentRepository commentRepository, ReviewerService reviewerService, UserService userService, DocumentReviewServiceImpl documentReviewService, DocumentService documentService) {
+    public ReviewActionServiceImpl(INotificationRepository notificationRepository , IReviewActionRepository reviewActionRepository , ICommentRepository commentRepository, ReviewerService reviewerService, UserService userService, IDocumentReviewRepository documentReviewRepository, DocumentService documentService) {
         this.reviewActionRepository = reviewActionRepository;
         this.reviewerService = reviewerService;
         this.userService = userService;
-        this.documentReviewService = documentReviewService;
+        this.documentReviewRepository = documentReviewRepository;
         this.documentService = documentService;
         this.commentRepository = commentRepository;
         this.notificationRepository = notificationRepository;
@@ -59,7 +61,8 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
     @Override
     public ReviewAction save(CreateReviewActionDTO reviewActionDTO) {
         Reviewer reviewer = reviewerService.findReviewerById(reviewActionDTO.getReviewerId());
-        DocumentReview documentReview = documentReviewService.getDocumentReviewById(reviewActionDTO.getDocumentReviewId());
+        DocumentReview documentReview = documentReviewRepository.findById(reviewActionDTO.getDocumentReviewId()).orElseThrow(()-> {throw new NotFoundException("The Document review was not found");
+        });
         ReviewAction reviewAction = new ReviewAction();
         reviewAction.setReviewer(reviewer);
         reviewAction.setDocumentReview(documentReview);
@@ -175,7 +178,8 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
 
     @Override
     public List<ReviewAction> findByDocumentReviewId(UUID documentReviewId) {
-        DocumentReview document_review = documentReviewService.getDocumentReviewById(documentReviewId);
+        DocumentReview document_review = documentReviewRepository.findById(documentReviewId).orElseThrow(()-> {throw new NotFoundException("The Document review was not found");
+        });
         try {
             return reviewActionRepository.findAllByDocumentReview(document_review);
         }catch (Exception e){
@@ -185,7 +189,8 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
 
     @Override
     public List<ReviewAction> findByDocumentReviewIdAndStatus(UUID documentReviewId, EReviewStatus status) {
-        DocumentReview document_review = documentReviewService.getDocumentReviewById(documentReviewId);
+        DocumentReview document_review = documentReviewRepository.findById(documentReviewId).orElseThrow(()-> {throw new NotFoundException("The Document review was not found");
+        });
         try {
             return reviewActionRepository.findAllByDocumentReviewAndAction(document_review , status);
         }catch (Exception e){
@@ -195,7 +200,8 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
 
     @Override
     public List<ReviewAction> findByDocumentReviewIdAndReviewerId(UUID documentReviewId, UUID reviewerId) {
-        DocumentReview document_review = documentReviewService.getDocumentReviewById(documentReviewId);
+        DocumentReview document_review = documentReviewRepository.findById(documentReviewId).orElseThrow(()-> {throw new NotFoundException("The Document review was not found");
+        });
         Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
         try {
             return reviewActionRepository.findAllByDocumentReviewAndReviewer(document_review , reviewer);
