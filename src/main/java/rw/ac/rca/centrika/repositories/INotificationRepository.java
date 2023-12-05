@@ -10,7 +10,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface INotificationRepository extends JpaRepository<Notification, UUID> {
-    List<Notification> findAllByUser(User user);
-    @Query(value = "SELECT * FROM notification WHERE user_id = ?1 AND is_read = ?2", nativeQuery = true)
-    List<Notification> getAllByUserAndRead(UUID user , boolean read);
+    List<Notification> findAllBySender(User user);
+    List<Notification> findAllByReceiver(User user);
+
+    List<Notification> findAllBySenderAndRead(User user , boolean isRead);
+    List<Notification> findAllByReceiverAndRead(User user , boolean isRead);
+
+
 }

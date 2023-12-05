@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateNotificationDTO {
-    private UUID user;
+    private UUID sender;
+    private UUID receiver;
     private String message;
 }
