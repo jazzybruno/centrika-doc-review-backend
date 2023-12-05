@@ -8,15 +8,16 @@ import rw.ac.rca.centrika.dtos.requests.CreateDocumentDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentDTO;
 import rw.ac.rca.centrika.enumerations.ECategory;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
+import rw.ac.rca.centrika.enumerations.ERelationType;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.*;
 import rw.ac.rca.centrika.repositories.IDepartmentRepository;
+import rw.ac.rca.centrika.repositories.IDocumentRelationRepository;
 import rw.ac.rca.centrika.repositories.IDocumentRepository;
 import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.services.DocumentService;
 import rw.ac.rca.centrika.services.ReferenceNumberService;
-import rw.ac.rca.centrika.utils.Utility;
 
 import java.io.IOException;
 import java.util.Date;
@@ -31,14 +32,16 @@ public class DocumentServiceImpl implements DocumentService {
     private final  FileServiceImpl  fileService;
     private final IDocumentReviewRepository documentReviewRepository;
     private final ReferenceNumberService referenceNumberService;
+    private final IDocumentRelationRepository documentRelationRepository;
     @Autowired
-    public DocumentServiceImpl(IDocumentRepository documentRepository, UserServiceImpl userService, IDepartmentRepository departmentRepository, FileServiceImpl fileService, IDocumentReviewRepository documentReviewRepository, ReferenceNumberService referenceNumberService) {
+    public DocumentServiceImpl(IDocumentRepository documentRepository, UserServiceImpl userService, IDepartmentRepository departmentRepository, FileServiceImpl fileService, IDocumentReviewRepository documentReviewRepository, ReferenceNumberService referenceNumberService, IDocumentRelationRepository documentRelationRepository) {
         this.documentRepository = documentRepository;
         this.userService = userService;
         this.departmentRepository = departmentRepository;
         this.fileService = fileService;
         this.documentReviewRepository = documentReviewRepository;
         this.referenceNumberService = referenceNumberService;
+        this.documentRelationRepository = documentRelationRepository;
     }
 
     @Override
@@ -91,8 +94,22 @@ public class DocumentServiceImpl implements DocumentService {
         document.setStatus(status);
         document.setCreatedBy(user);
         document.setCreatedAt(new Date());
+
+
         try {
-              documentRepository.save(document);
+              Document savedDoc = documentRepository.save(document);
+
+          //   if the document is a child document then we need to create a relation between the parent and the child
+            if(createDocumentDTO.getRelationType().isPresent() && createDocumentDTO.getParentDocument().isPresent()){
+                ERelationType relationType = createDocumentDTO.getRelationType().get();
+                Document parentDocument = createDocumentDTO.getParentDocument().get();
+                DocumentRelation documentRelation = new DocumentRelation();
+                documentRelation.setRelationType(relationType);
+                documentRelation.setParentDocument(parentDocument);
+                documentRelation.setChildDocument(savedDoc);
+                documentRelationRepository.save(documentRelation);
+            }
+
               return document;
           }catch (Exception e){
               throw new InternalServerErrorException(e.getMessage());
