@@ -21,13 +21,11 @@ public class Department {
     private UUID id;
     private String name;
     private String description;
-    @Column(name = "created_by")
-    private UUID createdBy;
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User createdBy;
 
-    @Transient
-    private User createdByUser;
-
-    public Department(String name, String description, UUID createdBy) {
+    public Department(String name, String description, User createdBy) {
         this.name = name;
         this.description = description;
         this.createdBy = createdBy;
