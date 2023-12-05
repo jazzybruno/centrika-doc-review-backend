@@ -19,5 +19,6 @@ public interface ReviewerService {
 
         public List<Reviewer> findByDocumentReviewId(UUID documentReviewId);
         public List<Reviewer> findByUserId(UUID userId);
+        public Reviewer findByUserAndDocumentReview(UUID documentReviewId , UUID userId);
 
 }

@@ -120,4 +120,16 @@ public class ReviewerServiceImplementor implements ReviewerService {
             throw new InternalServerErrorException(e.getMessage());
         }
     }
+
+    @Override
+    public Reviewer findByUserAndDocumentReview(UUID documentReviewId , UUID userId){
+        User user = userService.getUserById(userId);
+        DocumentReview documentReview = documentReviewService.getDocumentReviewById(documentReviewId);
+        try {
+            Optional<Reviewer>  optionalReviewer =  reviewerRepository.findByUserAndDocumentReview(user ,  documentReview);
+            return optionalReviewer.orElse(null);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
 }

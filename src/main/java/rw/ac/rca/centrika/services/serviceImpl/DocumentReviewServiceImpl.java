@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import rw.ac.rca.centrika.dtos.CreateReviewerDTO;
 import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
 import rw.ac.rca.centrika.enumerations.EReviewStatus;
@@ -15,27 +16,32 @@ import rw.ac.rca.centrika.models.*;
 import rw.ac.rca.centrika.repositories.ICommentRepository;
 import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.repositories.INotificationRepository;
+import rw.ac.rca.centrika.services.DepartmentService;
 import rw.ac.rca.centrika.services.DocumentReviewService;
+import rw.ac.rca.centrika.services.ReviewerService;
 
 import javax.print.Doc;
 import java.io.IOException;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
 public class DocumentReviewServiceImpl implements DocumentReviewService {
     private IDocumentReviewRepository documentReviewRepository;
     private DocumentServiceImpl documentService;
     private UserServiceImpl userService;
     private INotificationRepository notificationRepository;
     private ICommentRepository commentRepository;
+    private ReviewerService reviewerService;
+    private DepartmentService departmentService;
     @Autowired
-    public DocumentReviewServiceImpl(IDocumentReviewRepository documentReviewRepository, DocumentServiceImpl documentService, UserServiceImpl userService , INotificationRepository notificationRepository ,  ICommentRepository commentRepository) {
+    public DocumentReviewServiceImpl(DepartmentService departmentService , IDocumentReviewRepository documentReviewRepository , ReviewerService reviewerService, DocumentServiceImpl documentService, UserServiceImpl userService , INotificationRepository notificationRepository ,  ICommentRepository commentRepository) {
         this.documentReviewRepository = documentReviewRepository;
         this.documentService = documentService;
         this.userService = userService;
         this.notificationRepository = notificationRepository;
         this.commentRepository = commentRepository;
+        this.reviewerService = reviewerService;
+        this.departmentService = departmentService;
     }
 
     @Override
@@ -74,6 +80,10 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         try {
             DocumentReview review = documentReviewRepository.save(documentReview);
             for (UUID user : requestReviewDTO.getReviewers()) {
+                CreateReviewerDTO createReviewerDTO = new CreateReviewerDTO();
+                createReviewerDTO.setDocumentReviewId(review.getId());
+                createReviewerDTO.setUserId(user);
+                reviewerService.createReviewer(createReviewerDTO);
                 User user1 = userService.getUserById(user);
                 String message = "You have a new document review from: " + createdBy.getUsername();
                 Notification notification = new Notification(
@@ -92,36 +102,27 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     @Override
     @Transactional
     public DocumentReview updateDocumentReview(UUID docReviewId, UpdateDocumentReviewDTO updateDocumentReviewDTO) {
-        DocumentReview documentReview = documentReviewRepository.findById(docReviewId).orElseThrow(() -> {throw new NotFoundException("The document Review was not found");
-        });
-        User user = userService.getUserById(updateDocumentReviewDTO.getReviewer());
-        User user1 = userService.getUserById(updateDocumentReviewDTO.getCreator());
-        try {
-            Set<User> users = documentReview.getReviewers();
-            users.add(user);
-            documentReview.setReviewers(users);
-            documentReview.setStatus(EDocStatus.PENDING);
-            documentReview.setUpdatedAt(new Date());
-            CreateDocumentDTO createDocumentDTO = new CreateDocumentDTO(
-                    updateDocumentReviewDTO.getTitle(),
-                    updateDocumentReviewDTO.getDescription(),
-                    updateDocumentReviewDTO.getCategory(),
-                    updateDocumentReviewDTO.getDepartmentId(),
-                    updateDocumentReviewDTO.getCreator(),
-                    documentReview.getId()
-            );
-            Document document = documentService.createDocument(file , createDocumentDTO);
-            documentReview.setCurrentDocument(document.getId());
-            String message =  "You have an updated document review from: " +  user1.getUsername();
-            Notification notification = new Notification(
-                    user,
-                    message,
-                    false
-            );
-            Date date = new Date();
-            notification.setCreatedAt(date);
-            notificationRepository.save(notification);
-            return documentReview;
+        DocumentReview documentReview = this.getDocumentReviewById(docReviewId);
+         try {
+             DocumentReview review = documentReviewRepository.save(documentReview);
+             for (UUID user : updateDocumentReviewDTO.getReviewers()) {
+                Reviewer reviewer = reviewerService.findByUserAndDocumentReview(docReviewId , user);
+                if(reviewer == null){
+                    CreateReviewerDTO createReviewerDTO = new CreateReviewerDTO();
+                    createReviewerDTO.setDocumentReviewId(review.getId());
+                    createReviewerDTO.setUserId(user);
+                    reviewerService.createReviewer(createReviewerDTO);
+                    User user1 = userService.getUserById(user);
+                    String message = "You have a new document review from: " + documentReview.getCreatedBy().getUsername();
+                    Notification notification = new Notification(
+                            documentReview.getCreatedBy(),
+                            user1,
+                            message
+                    );
+                    notificationRepository.save(notification);
+                }
+             }
+                return documentReview;
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -140,10 +141,15 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
 
     @Override
     public List<DocumentReview> getDocumentReviewByCreator(UUID creatorId) {
-        return null;
+        User user = userService.getUserById(creatorId);
+        try {
+            return documentReviewRepository.findAllByCreatedBy(user);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
-
+// action so we first implement actions
 
     @Override
     public DocumentReview forwardTheDocument(ForwardDocumentDTO forwardDocumentDTO) {
@@ -174,19 +180,36 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
        }
     }
 
+    // actions so we first implement the action
+
     @Override
     public List<DocumentReview> findDocumentReviewByDocumentId(UUID documentId) {
-        return null;
+        Document document = documentService.getDocumentById(documentId);
+        try {
+            return documentReviewRepository.findAllByDocument(document);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public List<DocumentReview> getDocumentReviewBySenderDepartment(UUID senderDepartmentId) {
-        return null;
+        Department department = departmentService.getDepartmentById(senderDepartmentId);
+        try {
+            return documentReviewRepository.findAllBySendingDepartment(department);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
     @Override
     public List<DocumentReview> getDocumentReviewByReceiverDepartment(UUID receiverDepartmentId) {
-        return null;
+        Department department = departmentService.getDepartmentById(receiverDepartmentId);
+        try {
+            return documentReviewRepository.findAllByReceivingDepartment(department);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
 
 }
