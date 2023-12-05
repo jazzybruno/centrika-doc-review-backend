@@ -54,7 +54,6 @@ public class DocumentServiceImpl implements DocumentService {
         User user = userService.getUserById(userId);
          return documentRepository.findAllByCreatedBy(user);
     }
-
     @Override
     public List<Document> getDocumentByDepartment(UUID deptId) {
         Department department = departmentRepository.findById(deptId).orElseThrow(() -> {throw new NotFoundException("The Department was not found");
