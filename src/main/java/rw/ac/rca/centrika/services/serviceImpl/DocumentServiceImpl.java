@@ -1,6 +1,5 @@
 package rw.ac.rca.centrika.services.serviceImpl;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,24 +8,16 @@ import rw.ac.rca.centrika.dtos.requests.CreateDocumentDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentDTO;
 import rw.ac.rca.centrika.enumerations.ECategory;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
-import rw.ac.rca.centrika.enumerations.EStatus;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
-import rw.ac.rca.centrika.exceptions.UnAuthorizedException;
-import rw.ac.rca.centrika.models.Department;
-import rw.ac.rca.centrika.models.Document;
-import rw.ac.rca.centrika.models.DocumentReview;
-import rw.ac.rca.centrika.models.User;
+import rw.ac.rca.centrika.models.*;
 import rw.ac.rca.centrika.repositories.IDepartmentRepository;
 import rw.ac.rca.centrika.repositories.IDocumentRepository;
 import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
-import rw.ac.rca.centrika.security.UserPrincipal;
-import rw.ac.rca.centrika.services.DocumentReviewService;
 import rw.ac.rca.centrika.services.DocumentService;
-import rw.ac.rca.centrika.utils.UserUtils;
+import rw.ac.rca.centrika.services.ReferenceNumberService;
 import rw.ac.rca.centrika.utils.Utility;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
@@ -34,20 +25,20 @@ import java.util.UUID;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
-
     private final IDocumentRepository documentRepository;
     private final UserServiceImpl userService;
     private final IDepartmentRepository departmentRepository;
     private final  FileServiceImpl  fileService;
     private final IDocumentReviewRepository documentReviewRepository;
-
+    private final ReferenceNumberService referenceNumberService;
     @Autowired
-    public DocumentServiceImpl(IDocumentRepository documentRepository, UserServiceImpl userService, IDepartmentRepository departmentRepository, FileServiceImpl fileService, IDocumentReviewRepository documentReviewRepository) {
+    public DocumentServiceImpl(IDocumentRepository documentRepository, UserServiceImpl userService, IDepartmentRepository departmentRepository, FileServiceImpl fileService, IDocumentReviewRepository documentReviewRepository, ReferenceNumberService referenceNumberService) {
         this.documentRepository = documentRepository;
         this.userService = userService;
         this.departmentRepository = departmentRepository;
         this.fileService = fileService;
         this.documentReviewRepository = documentReviewRepository;
+        this.referenceNumberService = referenceNumberService;
     }
 
     @Override
@@ -75,50 +66,45 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public Document createDocument(MultipartFile docFile ,  CreateDocumentDTO createDocumentDTO) throws IOException {
-        Department department = departmentRepository.findById(createDocumentDTO.getDepartmentId()).orElseThrow(() -> {throw new NotFoundException("The Department was not found");
-        });
-        DocumentReview documentReview = documentReviewRepository.findById(createDocumentDTO.getDocReviewId()).orElseThrow(() -> {throw new NotFoundException("The Document Review was not found");
-        });
-//        if(UserUtils.isUserLoggedIn()){
-          try {
-//              UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
-//              assert userPrincipal != null;
-//              User user = userService.getUserById(userPrincipal.getId());
-              User user = userService.getUserById(createDocumentDTO.getCreator());
-              String fileName = fileService.uploadFile(docFile);
-              int referenceNumber = Utility.randomNum();
-              EDocStatus status = EDocStatus.PENDING;
-              ECategory category = createDocumentDTO.getCategory();
-              Document document = new Document(
-                      createDocumentDTO.getTitle(),
-                      createDocumentDTO.getDescription(),
-                      fileName,
-                      category,
-                      status,
-                      referenceNumber,
-                      user,
-                      department,
-                      documentReview
-              );
-              document.setCreatedAt(new Date());
+        Document document = new Document();
+        if(createDocumentDTO.getCategory().equals(ECategory.EXTERNAL)){
+            // if it is external then the reference number is a must
+            if(createDocumentDTO.getReferenceNumberId().isEmpty()){
+                throw new NotFoundException("The reference number is required for and external document");
+            }else {
+                ReferenceNumber referenceNumber = referenceNumberService.getReferenceNumberById(createDocumentDTO.getReferenceNumberId().get());
+                document.setReferenceNumber(referenceNumber);
+            }
+
+        }else{
+            // if it is internal then the reference number is not a must
+            document.setReferenceNumber(null);
+        }
+        User user = userService.getUserById(createDocumentDTO.getCreator());
+        String fileName = fileService.uploadFile(docFile);
+        EDocStatus status = EDocStatus.PENDING;
+        ECategory category = createDocumentDTO.getCategory();
+        document.setTitle(createDocumentDTO.getTitle());
+        document.setTitle(createDocumentDTO.getDescription());
+        document.setFileUrl(fileName);
+        document.setCategory(category);
+        document.setStatus(status);
+        document.setCreatedBy(user);
+        document.setCreatedAt(new Date());
+        try {
               documentRepository.save(document);
               return document;
           }catch (Exception e){
               throw new InternalServerErrorException(e.getMessage());
           }
-//        }else{
-//            throw new UnAuthorizedException("You are not authorized to perform this activity");
-//        }
     }
 
     @Override
     @Transactional
     public Document updatedocument(UUID doc_id, UpdateDocumentDTO updateDocumentDTO) {
         Document document = documentRepository.findById(doc_id).orElseThrow(()-> {throw new NotFoundException("The document was not found");});
-        Department department = departmentRepository.findById(updateDocumentDTO.getDepartmentId()).orElseThrow(() -> {throw new NotFoundException("The Department was not found");
-        });
         try {
-            document.setDepartment(department);
+            document.setTitle(updateDocumentDTO.getTitle());
             document.setDescription(updateDocumentDTO.getDescription());
             return document;
         }catch (Exception e){
@@ -129,22 +115,15 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     @Transactional
     public Document updateDocFile(UUID docId, MultipartFile docFile)  {
-        if (UserUtils.isUserLoggedIn()) {
             Document document = documentRepository.findById(docId).orElseThrow(()-> {throw new NotFoundException("The document was not found");});
             String normalName = document.getFileUrl();
             try {
-                UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
-                assert userPrincipal != null;
-                User user = userService.getUserById(userPrincipal.getId());
                 String fileName = fileService.updateFile(normalName , docFile);
                 document.setFileUrl(fileName);
                 return document;
             } catch (Exception e) {
                 throw new InternalServerErrorException(e.getMessage());
             }
-        }else{
-            throw new UnAuthorizedException("You are not authorized to perform this activity");
-        }
     }
 
     @Override
@@ -159,21 +138,38 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    @Transactional
-    public Document approveDocument(UUID doc_id) {
-        Document document = documentRepository.findById(doc_id).orElseThrow(()-> {throw new NotFoundException("The document was not found");});
+    public Document getDocumentByReferenceNumber(UUID referenceNumberId) {
+        ReferenceNumber referenceNumber = referenceNumberService.getReferenceNumberById(referenceNumberId);
         try {
-            EDocStatus eDocStatus = EDocStatus.APPROVED;
-            document.setStatus(eDocStatus);
-            return document;
-        }catch (Exception e){
+            return documentRepository.findAllByReferenceNumber(referenceNumber);
+        } catch (Exception e) {
             throw new InternalServerErrorException(e.getMessage());
         }
     }
 
     @Override
-    public int getReferenceNumber() {
-        List<Document> documents = documentRepository.findAllByCategory(ECategory.EXTERNAL);
-        return documents.size() + 1;
+    @Transactional
+    public Document updateReferenceNumber(UUID docId, UUID referenceNumberId) {
+        ReferenceNumber referenceNumber = referenceNumberService.getReferenceNumberById(referenceNumberId);
+        Document document = documentRepository.findById(docId).orElseThrow(()-> {throw new NotFoundException("The document was not found");});
+        try {
+            document.setReferenceNumber(referenceNumber);
+            return document;
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage());
+        }
     }
+
+    @Override
+    @Transactional
+    public Document updateDocumentStatus(UUID docId, EDocStatus status) {
+        Document document = documentRepository.findById(docId).orElseThrow(()-> {throw new NotFoundException("The document was not found");});
+        try {
+            document.setStatus(status);
+            return document;
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
 }

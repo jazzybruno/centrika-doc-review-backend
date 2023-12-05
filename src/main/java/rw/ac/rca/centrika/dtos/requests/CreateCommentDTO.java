@@ -20,5 +20,5 @@ import java.util.UUID;
 @NoArgsConstructor
 public class CreateCommentDTO {
     private String content;
-    private UUID documentReviewId;
+    private UUID reviewAction;
 }

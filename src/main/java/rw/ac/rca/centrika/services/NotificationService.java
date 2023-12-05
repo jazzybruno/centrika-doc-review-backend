@@ -16,9 +16,11 @@ public interface NotificationService {
 
     // other methods
     public Notification markAsRead(UUID notId);
-    public List<Notification> markAllAsRead(UUID userId);
-    public List<Notification> getAllRead(UUID userId);
-    public List<Notification> getAllUnRead(UUID userId);
+    public List<Notification> markAllAsRead(UUID receiverId);
+    public List<Notification> getAllReadByReceiver(UUID receiverId);
+    public List<Notification> getAllReadBySender(UUID senderId);
+    public List<Notification> getAllUnReadByReceiver(UUID receiverId);
+    public List<Notification> getAllUnReadBySender(UUID senderId);
     public List<Notification> getAllNotificationsBySenderUser(UUID senderId);
     public List<Notification> getAllNotificationsByReceiverUser(UUID receiverId);
 }

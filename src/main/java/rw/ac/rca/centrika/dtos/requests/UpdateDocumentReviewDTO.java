@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rw.ac.rca.centrika.enumerations.ECategory;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,12 +16,5 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateDocumentReviewDTO {
-    private String title;
-    private String description;
-    @Enumerated(EnumType.STRING)
-    private ECategory category;
-    private UUID departmentId;
-    public UUID reviewer;
-    public UUID creator;
-
+   private List<UUID> reviewers;
 }

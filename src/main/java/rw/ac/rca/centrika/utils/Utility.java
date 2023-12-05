@@ -9,7 +9,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 public class Utility {
@@ -83,5 +85,22 @@ public class Utility {
 
     public static boolean isCodeValid(String activationCode, String sentCode) {
         return activationCode.trim().equalsIgnoreCase(sentCode.trim());
+    }
+
+
+    public static String generateReferenceNumber(int currentCounter) {
+        // Get the current date
+        Date currentDate = new Date();
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
+        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
+
+        // Extract the current month and year
+        String currentMonth = monthFormat.format(currentDate);
+        String currentYear = yearFormat.format(currentDate);
+
+        // Construct the reference number
+        String referenceNumber = String.format("REF: %02d RWANDA/CENTRIKA %s/%s", currentCounter, currentYear, currentMonth);
+
+        return referenceNumber;
     }
 }

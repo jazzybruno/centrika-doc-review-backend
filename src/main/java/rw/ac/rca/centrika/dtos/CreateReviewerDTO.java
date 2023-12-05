@@ -5,12 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateReviewerDTO {
-    private String userId;
-    private String documentReviewId;
+    private UUID userId;
+    private UUID documentReviewId;
 
 }

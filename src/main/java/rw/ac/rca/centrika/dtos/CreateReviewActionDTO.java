@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rw.ac.rca.centrika.enumerations.EReviewStatus;
 
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 public class CreateReviewActionDTO {
     private UUID reviewerId;
     private UUID documentReviewId;
-    private String action;
+    private EReviewStatus action;
+    private String comment;
 
 }

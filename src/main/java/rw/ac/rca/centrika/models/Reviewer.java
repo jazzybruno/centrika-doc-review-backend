@@ -25,13 +25,9 @@ public class Reviewer {
     private Date createdAt;
     private Date updatedAt;
 
-    @ManyToMany
-    @JoinTable(
-            name = "reviewer_document_review",
-            joinColumns = @JoinColumn(name = "reviewer_id"),
-            inverseJoinColumns = @JoinColumn(name = "document_review_id")
-    )
-    private Set<DocumentReview> documentReview;
+    @ManyToOne
+    @JoinColumn(name = "document_review_id")
+    private DocumentReview documentReview;
 
     public Reviewer(User user, Date createdAt, Date updatedAt) {
         this.user = user;

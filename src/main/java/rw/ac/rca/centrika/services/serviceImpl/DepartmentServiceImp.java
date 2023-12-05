@@ -113,44 +113,4 @@ public class DepartmentServiceImp implements DepartmentService {
         }
     }
 
-    @Override
-    @Transactional
-    public Department addDepartmentHead(UUID deptId, UUID userId) {
-        Department department = departmentRepository.findById(deptId).orElseThrow(()-> {throw new NotFoundException("The department was not found");
-        });
-        User user = userService.getUserById(userId);
-        Role role = roleService.getRoleByName(EUserRole.DEPARTMENT_HEAD);
-        Role role1 = roleService.getRoleByName(EUserRole.USER);
-        Set<Role> roleSet = new HashSet<Role>();
-        if(department.getDepartmentHead() == null){
-            if(user != null){
-                department.setDepartmentHead(user.getId());
-                roleSet.add(role);
-                user.setRoles(roleSet);
-            }else{
-                throw new NotFoundException("The user was not found");
-            }
-        }else{
-            User head = userService.getUserById(department.getDepartmentHead());
-            if(head.getId().equals(userId)) {
-                throw new BadRequestAlertException("The user is already the department head");
-            }else{
-                Set<Role> roles = new HashSet<>();
-                roles.add(role1);
-                head.setRoles(roles);
-
-                Set<Role> roles1 = new HashSet<>();
-                roles1.add(role);
-                user.setRoles(roles1);
-
-                department.setDepartmentHead(user.getId());
-            }
-        }
-
-        try {
-            return department;
-        }catch (Exception e){
-            throw new InternalServerErrorException(e.getMessage());
-        }
-    }
 }

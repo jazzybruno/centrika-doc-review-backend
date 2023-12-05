@@ -3,6 +3,7 @@ package rw.ac.rca.centrika.services;
 import org.springframework.web.multipart.MultipartFile;
 import rw.ac.rca.centrika.dtos.requests.CreateDocumentDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentDTO;
+import rw.ac.rca.centrika.enumerations.EDocStatus;
 import rw.ac.rca.centrika.models.Document;
 
 import javax.print.Doc;
@@ -19,5 +20,7 @@ public interface DocumentService {
     public Document updatedocument(UUID doc_id , UpdateDocumentDTO updateDocumentDTO);
     public Document updateDocFile(UUID docId ,  MultipartFile docFile);
     public Document deleteDocument(UUID doc_id );
-
+    public Document getDocumentByReferenceNumber(UUID referenceNumberId);
+    public Document updateReferenceNumber(UUID docId , UUID referenceNumberId);
+    public Document updateDocumentStatus(UUID docId , EDocStatus status);
 }

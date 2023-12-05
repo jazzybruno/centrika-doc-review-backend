@@ -24,9 +24,6 @@ public class Department {
     @Column(name = "created_by")
     private UUID createdBy;
 
-    @Column(name = "department_head")
-    private UUID departmentHead = null;
-
     @Transient
     private User createdByUser;
 

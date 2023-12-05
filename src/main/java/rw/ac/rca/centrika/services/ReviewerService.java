@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface ReviewerService {
     // CRUD methods here
      public List<Reviewer> findAll();
-        public Reviewer findById(UUID reviewerId);
+        public Reviewer findReviewerById(UUID reviewerId);
         public Reviewer createReviewer(CreateReviewerDTO createReviewerDTO);
         public Reviewer updateReviewer(UUID reviewerId, CreateReviewerDTO updateReviewerDTO);
         public Boolean deleteReviewer(UUID reviewerId);
@@ -18,5 +18,7 @@ public interface ReviewerService {
     // Custom methods here
 
         public List<Reviewer> findByDocumentReviewId(UUID documentReviewId);
+        public List<Reviewer> findByUserId(UUID userId);
+        public Reviewer findByUserAndDocumentReview(UUID documentReviewId , UUID userId);
 
 }

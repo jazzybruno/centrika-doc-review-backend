@@ -10,9 +10,12 @@ import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.exceptions.UnAuthorizedException;
 import rw.ac.rca.centrika.models.Comment;
 import rw.ac.rca.centrika.models.DocumentReview;
+import rw.ac.rca.centrika.models.ReviewAction;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.repositories.ICommentRepository;
 import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
+import rw.ac.rca.centrika.repositories.IReviewActionRepository;
+import rw.ac.rca.centrika.repositories.IReviewerRepository;
 import rw.ac.rca.centrika.security.UserPrincipal;
 import rw.ac.rca.centrika.services.CommentService;
 import rw.ac.rca.centrika.utils.UserUtils;
@@ -26,7 +29,7 @@ import java.util.UUID;
 public class CommentServiceImpl implements CommentService {
     private final ICommentRepository commentRepository;
     private final UserServiceImpl userService;
-    private  final IDocumentReviewRepository documentReviewRepository;
+    private  final IReviewActionRepository reviewActionRepository;
     @Override
     public List<Comment> getAllComments() {
         return commentRepository.findAll();
@@ -40,7 +43,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment createComment(CreateCommentDTO createCommentDTO) {
-        DocumentReview documentReview = documentReviewRepository.findById(createCommentDTO.getDocumentReviewId()).orElseThrow(() -> {throw new NotFoundException("The document review was not found");});
+        ReviewAction reviewAction = reviewActionRepository.findById(createCommentDTO.getReviewAction()).orElseThrow(() -> {throw new NotFoundException("The review action was not found");});
         if(UserUtils.isUserLoggedIn()){
           try {
               UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
@@ -51,7 +54,7 @@ public class CommentServiceImpl implements CommentService {
                       createCommentDTO.getContent(),
                       createdAt,
                       user,
-                      documentReview
+                      reviewAction
               );
               commentRepository.save(comment);
               return comment;
@@ -89,10 +92,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getCommentByDocumentReview(UUID documentReviewId) {
-        DocumentReview documentReview = documentReviewRepository.findById(documentReviewId).orElseThrow(() -> {throw new NotFoundException("The document review was not found");});
+    public List<Comment> getCommentByReviewAction(UUID reviewActionId) {
+        ReviewAction reviewAction = reviewActionRepository.findById(reviewActionId).orElseThrow(() -> {throw new NotFoundException("The review action was not found");});
         try {
-            return commentRepository.findAllByDocumentReview(documentReview);
+            return commentRepository.findAllByReviewAction(reviewAction);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }

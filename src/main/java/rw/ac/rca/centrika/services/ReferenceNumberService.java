@@ -12,18 +12,14 @@ public interface ReferenceNumberService {
     public List<ReferenceNumber> getAllReferenceNumbers();
     public ReferenceNumber getReferenceNumberById(UUID referenceNumberId);
     public ReferenceNumber createReferenceNumber(CreateReferenceNumberDTO referenceNumberDTO);
-    public ReferenceNumber updateReferenceNumber(UUID referenceNumberId, CreateReferenceNumberDTO referenceNumberDTO);
     public ReferenceNumber deleteReferenceNumber(UUID referenceNumberId);
 
     // Custom Methods
-    public ReferenceNumber generateReferenceNumber(CreateReferenceNumberDTO referenceNumberDTO);
     public ReferenceNumber updateReferenceNumberStatus(UUID referenceNumberId, ERefNumStatus status);
     public ReferenceNumber updateReferenceNumberDestination(UUID referenceNumberId, String destination);
     public List<ReferenceNumber> getReferenceNumbersByDepartment(UUID departmentId);
 
     // Search Methods
-    public List<ReferenceNumber> searchReferenceNumberByTitle(String title);
     public List<ReferenceNumber> searchReferenceNumberByDestination(String destination);
     public List<ReferenceNumber> searchReferenceNumberByStatus(ERefNumStatus status);
-    public List<ReferenceNumber> searchReferenceNumberByTitleAndDestination(String title, String destination);
 }

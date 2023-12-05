@@ -17,9 +17,4 @@ import java.util.UUID;
 public class UpdateDocumentDTO {
     private String title;
     private String description;
-    private String fileUrl;
-    @Enumerated(EnumType.STRING)
-    private EDocStatus status;
-    private int referenceNumber;
-    private UUID departmentId;
 }
