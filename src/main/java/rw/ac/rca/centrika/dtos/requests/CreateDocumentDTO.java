@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rw.ac.rca.centrika.enumerations.ECategory;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
+import rw.ac.rca.centrika.enumerations.ERelationType;
 import rw.ac.rca.centrika.models.Department;
+import rw.ac.rca.centrika.models.Document;
 import rw.ac.rca.centrika.models.User;
 
 import java.util.HashSet;
@@ -26,4 +28,6 @@ public class CreateDocumentDTO {
     private ECategory category;
     private UUID creator;
     private Optional<UUID> referenceNumberId;
+    private Optional<ERelationType> relationType;
+    private Optional<Document> parentDocument;
 }
