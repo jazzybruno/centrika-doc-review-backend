@@ -20,7 +20,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class DepartmentHeadServiceImpl implements DepartmentHeadService {
-
     private IDepartmentHeadRepository departmentHeadRepository;
     private IUserRepository userRepository;
     private IDepartmentRepository departmentRepository;

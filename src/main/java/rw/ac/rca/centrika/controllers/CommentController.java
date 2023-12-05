@@ -7,7 +7,6 @@ import rw.ac.rca.centrika.dtos.requests.CreateCommentDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateCommentDTO;
 import rw.ac.rca.centrika.models.Comment;
 import rw.ac.rca.centrika.services.CommentService;
-import rw.ac.rca.centrika.utils.ApResponse;
 import rw.ac.rca.centrika.utils.ApiResponse;
 
 import java.util.List;
@@ -35,15 +34,6 @@ public class CommentController {
         ));
     }
 
-    @GetMapping("/document-review/{documentReviewId}")
-    public ResponseEntity getCommentByDocumentReview(@PathVariable UUID documentReviewId) {
-        List<Comment> comments = commentService.getCommentByDocumentReview(documentReviewId);
-        return ResponseEntity.ok().body(new ApiResponse(
-                true,
-                "Successfully fetched all the comments by review ",
-                comments
-        ));
-    }
 
     @GetMapping("/user")
     public ResponseEntity getCommentByUser() {
@@ -92,6 +82,17 @@ public class CommentController {
                 true,
                 "Successfully deleted the comment ",
                 comment
+        ));
+    }
+
+    // New methods added from CommentService
+    @GetMapping("/review-action/{reviewActionId}")
+    public ResponseEntity getCommentByReviewAction(@PathVariable UUID reviewActionId) {
+        List<Comment> comments = commentService.getCommentByReviewAction(reviewActionId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all the comments by review action",
+                comments
         ));
     }
 

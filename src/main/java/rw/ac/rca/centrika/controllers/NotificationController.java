@@ -7,7 +7,6 @@ import rw.ac.rca.centrika.dtos.requests.CreateNotificationDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateNotificationDTO;
 import rw.ac.rca.centrika.models.Notification;
 import rw.ac.rca.centrika.services.NotificationService;
-import rw.ac.rca.centrika.utils.ApResponse;
 import rw.ac.rca.centrika.utils.ApiResponse;
 
 import java.util.List;
@@ -30,48 +29,18 @@ public class NotificationController {
         List<Notification> notifications = notificationService.getAllNotifications();
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
-                "Successfully fetched all the notifications",
+                "Successfully fetched all notifications",
                 notifications
         ));
     }
 
-    @GetMapping("/{notificationId}")
-    public ResponseEntity getNotificationById(@PathVariable UUID notificationId) {
-        Notification notification = notificationService.getNotificationById(notificationId);
+    @GetMapping("/{notId}")
+    public ResponseEntity getNotificationById(@PathVariable UUID notId) {
+        Notification notification = notificationService.getNotificationById(notId);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
-                "Successfully fetched the notification by id",
+                "Successfully fetched notification by id",
                 notification
-        ));
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity getAllNotificationsByUser(@PathVariable UUID userId) {
-        List<Notification> notifications = notificationService.getAllNotificationsByUser(userId);
-        return ResponseEntity.ok().body(new ApiResponse(
-                true,
-                "Successfully fetched all the notifications by user",
-                notifications
-        ));
-    }
-
-    @GetMapping("/user/read/{userId}")
-    public ResponseEntity getAllNotificationsByUserRead(@PathVariable UUID userId) {
-        List<Notification> notifications = notificationService.getAllRead(userId);
-        return ResponseEntity.ok().body(new ApiResponse(
-                true,
-                "Successfully fetched all the read notifications of the user",
-                notifications
-        ));
-    }
-
-    @GetMapping("/user/unread/{userId}")
-    public ResponseEntity getAllNotificationsByUserUnRead(@PathVariable UUID userId) {
-        List<Notification> notifications = notificationService.getAllUnRead(userId);
-        return ResponseEntity.ok().body(new ApiResponse(
-                true,
-                "Successfully fetched all the unread notifications",
-                notifications
         ));
     }
 
@@ -80,47 +49,107 @@ public class NotificationController {
         Notification notification = notificationService.createdNotification(createNotificationDTO);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
-                "Successfully created the notification",
+                "Successfully created notification",
                 notification
         ));
     }
 
-    @PutMapping("/{notificationId}")
-    public ResponseEntity updateNotification(@PathVariable UUID notificationId, @RequestBody UpdateNotificationDTO updateNotificationDTO) {
-        Notification notification = notificationService.updateNotification(notificationId, updateNotificationDTO);
+    @PutMapping("/{notId}")
+    public ResponseEntity updateNotification(@PathVariable UUID notId, @RequestBody UpdateNotificationDTO updateNotificationDTO) {
+        Notification notification = notificationService.updateNotification(notId, updateNotificationDTO);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
-                "Successfully updated the notification",
+                "Successfully updated notification",
                 notification
         ));
     }
 
-    @DeleteMapping("/{notificationId}")
-    public ResponseEntity deleteNotification(@PathVariable UUID notificationId) {
-        Notification notification = notificationService.deleteNotification(notificationId);
+    @DeleteMapping("/{notId}")
+    public ResponseEntity deleteNotification(@PathVariable UUID notId) {
+        Notification notification = notificationService.deleteNotification(notId);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
-                "Successfully deleted the notifications",
+                "Successfully deleted notification",
                 notification
         ));
     }
 
-    @PutMapping("/mark-as-read/{notificationId}")
-    public ResponseEntity markNotificationAsRead(@PathVariable UUID notificationId) {
-        Notification notification = notificationService.markAsRead(notificationId);
+    @PutMapping("/mark-as-read/{notId}")
+    public ResponseEntity markAsRead(@PathVariable UUID notId) {
+        Notification notification = notificationService.markAsRead(notId);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
-                "Successfully marked the notification as read",
+                "Successfully marked notification as read",
                 notification
         ));
     }
 
-    @PutMapping("/user/mark-as-read/all/{userId}")
-    public ResponseEntity markNotificationAllAsRead(@PathVariable UUID userId) {
-        List<Notification> notifications = notificationService.markAllAsRead(userId);
+    @PutMapping("/mark-all-as-read/{receiverId}")
+    public ResponseEntity markAllAsRead(@PathVariable UUID receiverId) {
+        List<Notification> notifications = notificationService.markAllAsRead(receiverId);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
-                "Successfully marked all the notifications as read",
+                "Successfully marked all notifications as read",
+                notifications
+        ));
+    }
+
+    @GetMapping("/read-by-receiver/{receiverId}")
+    public ResponseEntity getAllReadByReceiver(@PathVariable UUID receiverId) {
+        List<Notification> notifications = notificationService.getAllReadByReceiver(receiverId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all read notifications by receiver",
+                notifications
+        ));
+    }
+
+    @GetMapping("/read-by-sender/{senderId}")
+    public ResponseEntity getAllReadBySender(@PathVariable UUID senderId) {
+        List<Notification> notifications = notificationService.getAllReadBySender(senderId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all read notifications by sender",
+                notifications
+        ));
+    }
+
+    @GetMapping("/unread-by-receiver/{receiverId}")
+    public ResponseEntity getAllUnReadByReceiver(@PathVariable UUID receiverId) {
+        List<Notification> notifications = notificationService.getAllUnReadByReceiver(receiverId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all unread notifications by receiver",
+                notifications
+        ));
+    }
+
+    @GetMapping("/unread-by-sender/{senderId}")
+    public ResponseEntity getAllUnReadBySender(@PathVariable UUID senderId) {
+        List<Notification> notifications = notificationService.getAllUnReadBySender(senderId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all unread notifications by sender",
+                notifications
+        ));
+    }
+
+    @GetMapping("/by-sender/{senderId}")
+    public ResponseEntity getAllNotificationsBySenderUser(@PathVariable UUID senderId) {
+        List<Notification> notifications = notificationService.getAllNotificationsBySenderUser(senderId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all notifications by sender user",
+                notifications
+        ));
+    }
+
+    @GetMapping("/by-receiver/{receiverId}")
+    public ResponseEntity getAllNotificationsByReceiverUser(@PathVariable UUID receiverId) {
+        List<Notification> notifications = notificationService.getAllNotificationsByReceiverUser(receiverId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all notifications by receiver user",
                 notifications
         ));
     }
