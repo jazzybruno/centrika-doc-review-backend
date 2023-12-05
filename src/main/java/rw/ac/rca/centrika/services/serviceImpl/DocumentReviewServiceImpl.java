@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import rw.ac.rca.centrika.dtos.CreateReviewActionDTO;
 import rw.ac.rca.centrika.dtos.CreateReviewerDTO;
 import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
@@ -18,6 +19,7 @@ import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.services.DepartmentService;
 import rw.ac.rca.centrika.services.DocumentReviewService;
+import rw.ac.rca.centrika.services.ReviewActionService;
 import rw.ac.rca.centrika.services.ReviewerService;
 
 import javax.print.Doc;
@@ -33,8 +35,9 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     private ICommentRepository commentRepository;
     private ReviewerService reviewerService;
     private DepartmentService departmentService;
+    private ReviewActionService reviewActionService;
     @Autowired
-    public DocumentReviewServiceImpl(DepartmentService departmentService , IDocumentReviewRepository documentReviewRepository , ReviewerService reviewerService, DocumentServiceImpl documentService, UserServiceImpl userService , INotificationRepository notificationRepository ,  ICommentRepository commentRepository) {
+    public DocumentReviewServiceImpl(ReviewActionService reviewActionService , DepartmentService departmentService , IDocumentReviewRepository documentReviewRepository , ReviewerService reviewerService, DocumentServiceImpl documentService, UserServiceImpl userService , INotificationRepository notificationRepository ,  ICommentRepository commentRepository) {
         this.documentReviewRepository = documentReviewRepository;
         this.documentService = documentService;
         this.userService = userService;
@@ -42,6 +45,7 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         this.commentRepository = commentRepository;
         this.reviewerService = reviewerService;
         this.departmentService = departmentService;
+        this.reviewActionService = reviewActionService;
     }
 
     @Override
@@ -157,23 +161,35 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         User user = userService.getUserById(forwardDocumentDTO.getReviewer());
         String forwardNotificationMessage = "The Document was forwarded to you for review by: " + user.getUsername();
         Notification notification = new Notification();
-        Comment comment = new Comment(
-                forwardDocumentDTO.getCommentContent(),
-                new Date(),
-                user,
-                documentReview
+
+        // add the new reviewer in the reviewers list
+        Reviewer reviewer = reviewerService.findByUserAndDocumentReview(forwardDocumentDTO.getReviewDocId() , forwardDocumentDTO.getNewReviewerId());
+         if(reviewer == null){
+             CreateReviewerDTO createReviewerDTO = new CreateReviewerDTO();
+             createReviewerDTO.setDocumentReviewId(forwardDocumentDTO.getReviewDocId());
+             createReviewerDTO.setUserId(forwardDocumentDTO.getNewReviewerId());
+             reviewerService.createReviewer(createReviewerDTO);
+             User user1 = userService.getUserById(forwardDocumentDTO.getNewReviewerId());
+             String message = "You have a new document review from: " + user.getUsername();
+             Notification notification1 = new Notification(
+                     user,
+                     user1,
+                     message
+             );
+             notificationRepository.save(notification1);
+         }
+
+        // Create the action
+        CreateReviewActionDTO createReviewActionDTO = new CreateReviewActionDTO(
+                forwardDocumentDTO.getReviewer(),
+                forwardDocumentDTO.getReviewDocId(),
+                EReviewStatus.FORWARD,
+                forwardDocumentDTO.getCommentContent()
         );
+
+        this.reviewActionService.save(createReviewActionDTO);
+
        try {
-           User newReviewer = userService.getUserById(forwardDocumentDTO.getNewReviewerId());
-           Set<User> users = documentReview.getReviewers();
-           users.add(newReviewer);
-           documentReview.setReviewers(users);
-           notification.setCreatedAt(new Date());
-           notification.setMessage(forwardNotificationMessage);
-           notification.setUser(newReviewer);
-           notification.setRead(false);
-           notificationRepository.save(notification);
-           commentRepository.save(comment);
            return documentReview;
        }catch (Exception e){
            throw new InternalServerErrorException(e.getMessage());

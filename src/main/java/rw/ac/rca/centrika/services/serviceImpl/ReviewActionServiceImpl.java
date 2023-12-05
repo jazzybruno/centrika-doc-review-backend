@@ -8,8 +8,8 @@ import rw.ac.rca.centrika.enumerations.EReviewStatus;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.models.*;
 import rw.ac.rca.centrika.repositories.ICommentRepository;
+import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.repositories.IReviewActionRepository;
-import rw.ac.rca.centrika.repositories.IReviewerRepository;
 import rw.ac.rca.centrika.services.*;
 
 import java.util.Date;
@@ -24,15 +24,17 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
     private DocumentReviewServiceImpl documentReviewService;
     private DocumentService documentService;
     private ICommentRepository commentRepository;
+    private INotificationRepository notificationRepository;
 
     @Autowired
-    public ReviewActionServiceImpl(IReviewActionRepository reviewActionRepository , ICommentRepository commentRepository, ReviewerService reviewerService, UserService userService, DocumentReviewServiceImpl documentReviewService, DocumentService documentService) {
+    public ReviewActionServiceImpl(INotificationRepository notificationRepository , IReviewActionRepository reviewActionRepository , ICommentRepository commentRepository, ReviewerService reviewerService, UserService userService, DocumentReviewServiceImpl documentReviewService, DocumentService documentService) {
         this.reviewActionRepository = reviewActionRepository;
         this.reviewerService = reviewerService;
         this.userService = userService;
         this.documentReviewService = documentReviewService;
         this.documentService = documentService;
         this.commentRepository = commentRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     @Override
@@ -72,6 +74,16 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
             comment.setCommentCreator(reviewer.getUser());
             comment.setCreatedAt(new Date());
             commentRepository.save(comment);
+
+
+            // create the notification
+            Notification notification = new Notification();
+            notification.setRead(false);
+            notification.setCreatedAt(new Date());
+            notification.setMessage("You have a new review on the document "+ documentReview.getDocument().getTitle() + " by " + reviewer.getUser().getUsername());
+            notification.setSender(reviewer.getUser());
+            notification.setReceiver(documentReview.getCreatedBy());
+            notificationRepository.save(notification);
 
             return action;
         }catch (Exception e){
