@@ -22,4 +22,6 @@ public interface ReferenceNumberService {
     // Search Methods
     public List<ReferenceNumber> searchReferenceNumberByDestination(String destination);
     public List<ReferenceNumber> searchReferenceNumberByStatus(ERefNumStatus status);
+
+    List<ReferenceNumber> getReferenceNumbersByUser(UUID userId);
 }

@@ -142,4 +142,14 @@ public class ReferenceNumberServiceImpl implements ReferenceNumberService {
         }
     }
 
+    @Override
+    public List<ReferenceNumber> getReferenceNumbersByUser(UUID userId) {
+        User user = userService.getUserById(userId);
+        try {
+            return referenceNumberRepository.findAllByCreatedBy(user);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
 }

@@ -94,6 +94,17 @@ public class ReferenceNumberController {
         ));
     }
 
+
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity getReferenceNumbersByUser(@PathVariable UUID userId) {
+        List<ReferenceNumber> referenceNumbers = referenceNumberService.getReferenceNumbersByUser(userId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched reference numbers by user",
+                referenceNumbers
+        ));
+    }
+
     @GetMapping("/search-by-destination")
     public ResponseEntity searchReferenceNumberByDestination(@RequestParam String destination) {
         List<ReferenceNumber> referenceNumbers = referenceNumberService.searchReferenceNumberByDestination(destination);
