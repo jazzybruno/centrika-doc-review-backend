@@ -63,6 +63,11 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
     public DepartmentHead createDepartmentHead(CreateDepartmentHeadDTO departmentHeadDTO) {
         Department department = departmentRepository.findById(departmentHeadDTO.getDepartmentId()).orElseThrow(() -> new NotFoundException("Department not found"));
         User user = userRepository.findById(departmentHeadDTO.getUserId()).orElseThrow(() -> new NotFoundException("User not found"));
+
+        if(departmentHeadRepository.findDepartmentHeadByDepartmentIdAndUserId(department, user) != null){
+            throw new InternalServerErrorException("Department head already exists");
+        }
+
         departmentHead = new DepartmentHead();
         departmentHead.setDepartmentId(department);
         departmentHead.setUserId(user);
@@ -126,6 +131,7 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
         try {
             return departmentHeadRepository.findDepartmentHeadByDepartmentId(department);
         }catch (Exception e){
+            e.printStackTrace();
             throw new InternalServerErrorException("Error while getting department head by department id");
         }
     }

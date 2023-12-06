@@ -117,4 +117,19 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
             throw new InternalServerErrorException(e.getMessage());
         }
     }
+
+    @Override
+    public List<DocumentRelation> getAllPredecessorsByRelationType(UUID documentId, ERelationType relationType) {
+        Document document = documentRepository.findById(documentId).orElseThrow(() -> new InternalServerErrorException("Document with id : " + documentId + "  not found"));
+        try{
+          return null;
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<DocumentRelation> getAllSuccessorsByRelationType(UUID documentId, ERelationType relationType) {
+        return null;
+    }
 }

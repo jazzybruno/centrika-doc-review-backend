@@ -9,6 +9,7 @@ import rw.ac.rca.centrika.dtos.requests.UpdateDocumentDTO;
 import rw.ac.rca.centrika.enumerations.ECategory;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
 import rw.ac.rca.centrika.enumerations.ERelationType;
+import rw.ac.rca.centrika.exceptions.BadRequestAlertException;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.*;
@@ -75,6 +76,10 @@ public class DocumentServiceImpl implements DocumentService {
                 throw new NotFoundException("The reference number is required for and external document");
             }else {
                 ReferenceNumber referenceNumber = referenceNumberService.getReferenceNumberById(createDocumentDTO.getReferenceNumberId().get());
+                if(documentRepository.existsByReferenceNumber(referenceNumber)){
+                    throw new BadRequestAlertException("The reference number is already used");
+
+                }
                 document.setReferenceNumber(referenceNumber);
             }
 
