@@ -21,6 +21,7 @@ import rw.ac.rca.centrika.services.DocumentService;
 import rw.ac.rca.centrika.services.ReferenceNumberService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -190,6 +191,36 @@ public class DocumentServiceImpl implements DocumentService {
             document.setStatus(status);
             return document;
         } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Document> getDocumentsRequestedToMe(UUID userId) {
+        User user = userService.getUserById(userId);
+        try {
+            List<DocumentReview> documentReviews =  documentReviewRepository.getDocumentsRequestedToMe(user);
+            List<Document> documents = new ArrayList<>();
+            for (DocumentReview documentReview : documentReviews) {
+                documents.add(documentReview.getDocument());
+            }
+            return documents;
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Document> getDocumentRequestedByMe(UUID userId) {
+        User user = userService.getUserById(userId);
+        try {
+            List<DocumentReview> documentReviews =  documentReviewRepository.getDocumentRequestedByMe(user);
+            List<Document> documents = new ArrayList<>();
+            for (DocumentReview documentReview : documentReviews) {
+                documents.add(documentReview.getDocument());
+            }
+            return documents;
+        }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
     }

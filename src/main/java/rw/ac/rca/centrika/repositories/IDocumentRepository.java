@@ -22,4 +22,5 @@ public interface IDocumentRepository extends JpaRepository<Document, UUID> {
     Document findAllByReferenceNumber(ReferenceNumber  referenceNumber);
 
     boolean existsByReferenceNumber(ReferenceNumber referenceNumberId);
+
 }
