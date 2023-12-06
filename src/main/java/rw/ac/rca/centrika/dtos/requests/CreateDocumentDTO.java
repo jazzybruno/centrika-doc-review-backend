@@ -1,6 +1,7 @@
 package rw.ac.rca.centrika.dtos.requests;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,5 +30,5 @@ public class CreateDocumentDTO {
     private UUID creator;
     private Optional<UUID> referenceNumberId;
     private Optional<ERelationType> relationType;
-    private Optional<Document> parentDocument;
+    private Optional<UUID> parentDocumentId;
 }

@@ -78,7 +78,6 @@ public class DocumentServiceImpl implements DocumentService {
                 ReferenceNumber referenceNumber = referenceNumberService.getReferenceNumberById(createDocumentDTO.getReferenceNumberId().get());
                 if(documentRepository.existsByReferenceNumber(referenceNumber)){
                     throw new BadRequestAlertException("The reference number is already used");
-
                 }
                 document.setReferenceNumber(referenceNumber);
             }
@@ -92,7 +91,7 @@ public class DocumentServiceImpl implements DocumentService {
         EDocStatus status = EDocStatus.PENDING;
         ECategory category = createDocumentDTO.getCategory();
         document.setTitle(createDocumentDTO.getTitle());
-        document.setTitle(createDocumentDTO.getDescription());
+        document.setDescription(createDocumentDTO.getDescription());
         document.setFileUrl(fileName);
         document.setCategory(category);
         document.setStatus(status);
@@ -104,9 +103,11 @@ public class DocumentServiceImpl implements DocumentService {
               Document savedDoc = documentRepository.save(document);
 
           //   if the document is a child document then we need to create a relation between the parent and the child
-            if(createDocumentDTO.getRelationType().isPresent() && createDocumentDTO.getParentDocument().isPresent()){
+            if(createDocumentDTO.getParentDocumentId().isEmpty() && createDocumentDTO.getRelationType().isEmpty()) {
+                // do nothing if there not present
+            } else {
                 ERelationType relationType = createDocumentDTO.getRelationType().get();
-                Document parentDocument = createDocumentDTO.getParentDocument().get();
+                Document parentDocument = documentRepository.findById(createDocumentDTO.getParentDocumentId().get()).orElseThrow(() -> new NotFoundException("The parent document was not found"));
                 DocumentRelation documentRelation = new DocumentRelation();
                 documentRelation.setRelationType(relationType);
                 documentRelation.setParentDocument(parentDocument);
@@ -114,7 +115,7 @@ public class DocumentServiceImpl implements DocumentService {
                 documentRelationRepository.save(documentRelation);
             }
 
-              return document;
+            return document;
           }catch (Exception e){
               throw new InternalServerErrorException(e.getMessage());
           }
