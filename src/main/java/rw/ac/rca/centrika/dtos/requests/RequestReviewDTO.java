@@ -18,10 +18,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestReviewDTO {
-
     public UUID documentId;
     public UUID createdBy;
     public Date expectedCompleteTime;
     public List<UUID> reviewers;
-
 }

@@ -23,4 +23,6 @@ public interface DocumentService {
     public Document getDocumentByReferenceNumber(UUID referenceNumberId);
     public Document updateReferenceNumber(UUID docId , UUID referenceNumberId);
     public Document updateDocumentStatus(UUID docId , EDocStatus status);
+    List<Document> getDocumentsRequestedToMe(UUID userId);
+    List<Document> getDocumentRequestedByMe(UUID userId);
 }

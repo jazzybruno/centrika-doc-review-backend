@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface IDepartmentHeadRepository extends JpaRepository<DepartmentHead, UUID> {
     DepartmentHead findDepartmentHeadByDepartmentId(Department department);
     DepartmentHead findDepartmentHeadByUserId(User user);
+    DepartmentHead findDepartmentHeadByDepartmentIdAndUserId(Department department, User user);
 }

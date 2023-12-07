@@ -1,12 +1,14 @@
 package rw.ac.rca.centrika.dtos.requests;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rw.ac.rca.centrika.enumerations.ECategory;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
+import rw.ac.rca.centrika.enumerations.ERelated;
 import rw.ac.rca.centrika.enumerations.ERelationType;
 import rw.ac.rca.centrika.models.Department;
 import rw.ac.rca.centrika.models.Document;
@@ -27,7 +29,9 @@ public class CreateDocumentDTO {
     @Enumerated(EnumType.STRING)
     private ECategory category;
     private UUID creator;
+    private ERelated isRelated;
     private Optional<UUID> referenceNumberId;
     private Optional<ERelationType> relationType;
-    private Optional<Document> parentDocument;
+    private Optional<UUID> parentDocumentId;
+
 }

@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rw.ac.rca.centrika.enumerations.EReviewStatus;
+import rw.ac.rca.centrika.enumerations.EReviewerStatus;
 
 import java.util.Date;
 import java.util.Set;
@@ -22,12 +24,16 @@ public class Reviewer {
     @ManyToOne
     @JoinColumn(name = "reviewer_id")
     private User user;
+
     private Date createdAt;
     private Date updatedAt;
 
     @ManyToOne
     @JoinColumn(name = "document_review_id")
     private DocumentReview documentReview;
+
+    @Enumerated(EnumType.STRING)
+    private EReviewerStatus status = EReviewerStatus.PENDING;
 
     public Reviewer(User user, Date createdAt, Date updatedAt) {
         this.user = user;

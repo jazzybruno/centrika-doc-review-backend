@@ -111,4 +111,13 @@ public class ReviewerController {
 
     // Add other endpoints as needed
 
+    @GetMapping("/document/{documentId}")
+    public ResponseEntity getReviewersByDocumentId(@PathVariable UUID documentId) {
+        List<Reviewer> reviewers = reviewerService.findByDocumentId(documentId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched reviewers by document",
+                reviewers
+        ));
+    }
 }

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rw.ac.rca.centrika.dtos.CreateReferenceNumberDTO;
 import rw.ac.rca.centrika.enumerations.ERefNumStatus;
+import rw.ac.rca.centrika.exceptions.BadRequestAlertException;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.models.Department;
 import rw.ac.rca.centrika.models.ReferenceNumber;
@@ -61,6 +62,7 @@ public class ReferenceNumberServiceImpl implements ReferenceNumberService {
             referenceNumber.setDestination(referenceNumberDTO.getDestination());
             referenceNumber.setStatus(referenceNumberDTO.getStatus());
             referenceNumber.setCreatedBy(user);
+            referenceNumber.setCreatedAt(new Date());
             return referenceNumberRepository.save(referenceNumber);
         } catch (Exception e) {
             throw new InternalServerErrorException(e.getMessage());
@@ -72,13 +74,16 @@ public class ReferenceNumberServiceImpl implements ReferenceNumberService {
     public ReferenceNumber deleteReferenceNumber(UUID referenceNumberId) {
         ReferenceNumber referenceNumber = getReferenceNumberById(referenceNumberId);
         boolean hasNextOne = !referenceNumberRepository.findAll().get(referenceNumberRepository.findAll().size() - 1).equals(referenceNumber);
-        boolean dayExpired = !referenceNumber.getCreatedAt().after(new Date());
+        boolean dayExpired = referenceNumber.getCreatedAt().after(new Date());
+
+        System.out.printf("hasNextOne: %s, dayExpired: %s", hasNextOne, dayExpired);
+        if(!hasNextOne && !dayExpired){
+            referenceNumberRepository.delete(referenceNumber);
+        }else{
+            throw new BadRequestAlertException("You can't delete this reference number but you can change its status");
+        }
+
         try {
-            if(hasNextOne && dayExpired){
-                referenceNumberRepository.delete(referenceNumber);
-            }else{
-                throw new InternalServerErrorException("You can't delete this reference number but you can change its status");
-            }
             return referenceNumber;
         } catch (Exception e) {
             throw new InternalServerErrorException(e.getMessage());
@@ -132,6 +137,16 @@ public class ReferenceNumberServiceImpl implements ReferenceNumberService {
     public List<ReferenceNumber> searchReferenceNumberByStatus(ERefNumStatus status) {
         try {
             return referenceNumberRepository.findAllByStatus(status);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<ReferenceNumber> getReferenceNumbersByUser(UUID userId) {
+        User user = userService.getUserById(userId);
+        try {
+            return referenceNumberRepository.findAllByCreatedBy(user);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }

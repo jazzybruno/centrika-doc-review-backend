@@ -1,10 +1,13 @@
 package rw.ac.rca.centrika.services.serviceImpl;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rw.ac.rca.centrika.dtos.CreateReviewActionDTO;
 import rw.ac.rca.centrika.dtos.UpdateReviewActionDTO;
+import rw.ac.rca.centrika.enumerations.EDocStatus;
 import rw.ac.rca.centrika.enumerations.EReviewStatus;
+import rw.ac.rca.centrika.enumerations.EReviewerStatus;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.*;
@@ -14,6 +17,7 @@ import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.repositories.IReviewActionRepository;
 import rw.ac.rca.centrika.services.*;
 
+import java.beans.Transient;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -39,10 +43,18 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
         this.notificationRepository = notificationRepository;
     }
 
+    public List<ReviewAction> addComment(List<ReviewAction> reviewActions){
+        for(ReviewAction reviewAction : reviewActions){
+            Comment comment = commentRepository.findAllByReviewAction(reviewAction);
+            reviewAction.setComment(comment);
+        }
+        return reviewActions;
+    }
+
     @Override
     public List<ReviewAction> findAll() {
         try {
-            return reviewActionRepository.findAll();
+            return addComment(reviewActionRepository.findAll());
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -59,6 +71,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
     }
 
     @Override
+    @Transactional
     public ReviewAction save(CreateReviewActionDTO reviewActionDTO) {
         Reviewer reviewer = reviewerService.findReviewerById(reviewActionDTO.getReviewerId());
         DocumentReview documentReview = documentReviewRepository.findById(reviewActionDTO.getDocumentReviewId()).orElseThrow(()-> {throw new NotFoundException("The Document review was not found");
@@ -67,8 +80,10 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
         reviewAction.setReviewer(reviewer);
         reviewAction.setDocumentReview(documentReview);
         reviewAction.setAction(reviewActionDTO.getAction());
+        reviewAction.setCreatedAt(new Date());
 
         try {
+            reviewer.setStatus(EReviewerStatus.REVIEWED);
             ReviewAction action =  reviewActionRepository.save(reviewAction);
             // Creat the comment
             Comment comment = new Comment();
@@ -87,6 +102,12 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
             notification.setSender(reviewer.getUser());
             notification.setReceiver(documentReview.getCreatedBy());
             notificationRepository.save(notification);
+
+            if(reviewActionDTO.getAction() == EReviewStatus.APPROVE){
+                documentReview.getDocument().setStatus(EDocStatus.APPROVED);
+            }else if(reviewActionDTO.getAction() == EReviewStatus.RETURN){
+                documentReview.getDocument().setStatus(EDocStatus.RETURNED);
+            }
 
             return action;
         }catch (Exception e){
@@ -128,7 +149,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
     public List<ReviewAction> findByReviewerId(UUID reviewerId) {
         Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
         try {
-              return reviewActionRepository.findAllByReviewer(reviewer);
+              return addComment(reviewActionRepository.findAllByReviewer(reviewer));
         }catch (Exception e) {
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -138,7 +159,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
     public List<ReviewAction> findByDocumentId(UUID documentId) {
         Document document = documentService.getDocumentById(documentId);
         try {
-           return reviewActionRepository.findAllByDocument(document);
+           return addComment(reviewActionRepository.findAllByDocument(document));
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -149,7 +170,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
         Document document = documentService.getDocumentById(documentId);
         Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
         try {
-            return reviewActionRepository.findAllByReviewerAndDocument(reviewer ,  document);
+            return addComment(reviewActionRepository.findAllByReviewerAndDocument(reviewer ,  document));
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -160,7 +181,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
         Document document = documentService.getDocumentById(documentId);
         Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
         try {
-            return reviewActionRepository.findAllByReviewerAndDocumentStatus(reviewer ,  document , status);
+            return addComment(reviewActionRepository.findAllByReviewerAndDocumentStatus(reviewer ,  document , status));
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -170,7 +191,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
     public List<ReviewAction> findByReviewerIdAndStatus(UUID reviewerId, EReviewStatus status) {
         Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
         try {
-            return reviewActionRepository.findAllByReviewerAndAction(reviewer , status);
+            return addComment(reviewActionRepository.findAllByReviewerAndAction(reviewer , status));
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -181,7 +202,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
         DocumentReview document_review = documentReviewRepository.findById(documentReviewId).orElseThrow(()-> {throw new NotFoundException("The Document review was not found");
         });
         try {
-            return reviewActionRepository.findAllByDocumentReview(document_review);
+            return addComment(reviewActionRepository.findAllByDocumentReview(document_review));
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -192,7 +213,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
         DocumentReview document_review = documentReviewRepository.findById(documentReviewId).orElseThrow(()-> {throw new NotFoundException("The Document review was not found");
         });
         try {
-            return reviewActionRepository.findAllByDocumentReviewAndAction(document_review , status);
+            return addComment(reviewActionRepository.findAllByDocumentReviewAndAction(document_review , status));
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
@@ -204,7 +225,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
         });
         Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
         try {
-            return reviewActionRepository.findAllByDocumentReviewAndReviewer(document_review , reviewer);
+            return addComment(reviewActionRepository.findAllByDocumentReviewAndReviewer(document_review , reviewer));
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }

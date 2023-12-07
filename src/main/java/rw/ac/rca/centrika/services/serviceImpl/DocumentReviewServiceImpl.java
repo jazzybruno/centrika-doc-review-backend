@@ -158,7 +158,7 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     @Override
     public DocumentReview forwardTheDocument(ForwardDocumentDTO forwardDocumentDTO) {
         DocumentReview documentReview = this.getDocumentReviewById(forwardDocumentDTO.getReviewDocId());
-        User user = userService.getUserById(forwardDocumentDTO.getReviewer());
+        User user = userService.getUserById(forwardDocumentDTO.getNewReviewerId());
         String forwardNotificationMessage = "The Document was forwarded to you for review by: " + user.getUsername();
         Notification notification = new Notification();
 
@@ -190,6 +190,7 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         this.reviewActionService.save(createReviewActionDTO);
 
        try {
+           documentReview.getDocument().setStatus(EDocStatus.PENDING);
            return documentReview;
        }catch (Exception e){
            throw new InternalServerErrorException(e.getMessage());

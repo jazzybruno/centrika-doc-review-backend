@@ -92,7 +92,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getCommentByReviewAction(UUID reviewActionId) {
+    public Comment getCommentByReviewAction(UUID reviewActionId) {
         ReviewAction reviewAction = reviewActionRepository.findById(reviewActionId).orElseThrow(() -> {throw new NotFoundException("The review action was not found");});
         try {
             return commentRepository.findAllByReviewAction(reviewAction);

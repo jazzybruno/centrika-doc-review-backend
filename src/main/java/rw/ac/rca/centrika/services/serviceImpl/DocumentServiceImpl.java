@@ -8,7 +8,9 @@ import rw.ac.rca.centrika.dtos.requests.CreateDocumentDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentDTO;
 import rw.ac.rca.centrika.enumerations.ECategory;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
+import rw.ac.rca.centrika.enumerations.ERelated;
 import rw.ac.rca.centrika.enumerations.ERelationType;
+import rw.ac.rca.centrika.exceptions.BadRequestAlertException;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.*;
@@ -20,6 +22,7 @@ import rw.ac.rca.centrika.services.DocumentService;
 import rw.ac.rca.centrika.services.ReferenceNumberService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -75,6 +78,9 @@ public class DocumentServiceImpl implements DocumentService {
                 throw new NotFoundException("The reference number is required for and external document");
             }else {
                 ReferenceNumber referenceNumber = referenceNumberService.getReferenceNumberById(createDocumentDTO.getReferenceNumberId().get());
+                if(documentRepository.existsByReferenceNumber(referenceNumber)){
+                    throw new BadRequestAlertException("The reference number is already used");
+                }
                 document.setReferenceNumber(referenceNumber);
             }
 
@@ -84,10 +90,10 @@ public class DocumentServiceImpl implements DocumentService {
         }
         User user = userService.getUserById(createDocumentDTO.getCreator());
         String fileName = fileService.uploadFile(docFile);
-        EDocStatus status = EDocStatus.PENDING;
+        EDocStatus status = EDocStatus.APPROVED;
         ECategory category = createDocumentDTO.getCategory();
         document.setTitle(createDocumentDTO.getTitle());
-        document.setTitle(createDocumentDTO.getDescription());
+        document.setDescription(createDocumentDTO.getDescription());
         document.setFileUrl(fileName);
         document.setCategory(category);
         document.setStatus(status);
@@ -98,18 +104,22 @@ public class DocumentServiceImpl implements DocumentService {
         try {
               Document savedDoc = documentRepository.save(document);
 
-          //   if the document is a child document then we need to create a relation between the parent and the child
-            if(createDocumentDTO.getRelationType().isPresent() && createDocumentDTO.getParentDocument().isPresent()){
-                ERelationType relationType = createDocumentDTO.getRelationType().get();
-                Document parentDocument = createDocumentDTO.getParentDocument().get();
-                DocumentRelation documentRelation = new DocumentRelation();
-                documentRelation.setRelationType(relationType);
-                documentRelation.setParentDocument(parentDocument);
-                documentRelation.setChildDocument(savedDoc);
-                documentRelationRepository.save(documentRelation);
-            }
+          if(createDocumentDTO.getIsRelated().equals(ERelated.RELATED)){
+                  if(createDocumentDTO.getRelationType().isEmpty()){
+                      throw new BadRequestAlertException("The relation type is required");
+                  }
+                  if(createDocumentDTO.getParentDocumentId().isEmpty()){
+                      throw new BadRequestAlertException("The parent document is required");
+                  }
+                  Document parentDocument = documentRepository.findById(createDocumentDTO.getParentDocumentId().get()).orElseThrow(()-> {throw new NotFoundException("The parent document was not found");});
+                  DocumentRelation documentRelation = new DocumentRelation();
+                  documentRelation.setChildDocument(savedDoc);
+                  documentRelation.setParentDocument(parentDocument);
+                  documentRelation.setRelationType(createDocumentDTO.getRelationType().get());
+                  documentRelationRepository.save(documentRelation);
+              }
 
-              return document;
+            return document;
           }catch (Exception e){
               throw new InternalServerErrorException(e.getMessage());
           }
@@ -184,6 +194,36 @@ public class DocumentServiceImpl implements DocumentService {
             document.setStatus(status);
             return document;
         } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Document> getDocumentsRequestedToMe(UUID userId) {
+        User user = userService.getUserById(userId);
+        try {
+            List<DocumentReview> documentReviews =  documentReviewRepository.getDocumentsRequestedToMe(user);
+            List<Document> documents = new ArrayList<>();
+            for (DocumentReview documentReview : documentReviews) {
+                documents.add(documentReview.getDocument());
+            }
+            return documents;
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Document> getDocumentRequestedByMe(UUID userId) {
+        User user = userService.getUserById(userId);
+        try {
+            List<DocumentReview> documentReviews =  documentReviewRepository.getDocumentRequestedByMe(user);
+            List<Document> documents = new ArrayList<>();
+            for (DocumentReview documentReview : documentReviews) {
+                documents.add(documentReview.getDocument());
+            }
+            return documents;
+        }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
     }

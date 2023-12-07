@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rw.ac.rca.centrika.dtos.CreateDocumentRelationDTO;
 import rw.ac.rca.centrika.enumerations.ERelationType;
+import rw.ac.rca.centrika.models.Document;
 import rw.ac.rca.centrika.models.DocumentRelation;
 import rw.ac.rca.centrika.services.DocumentRelationService;
 import rw.ac.rca.centrika.utils.ApiResponse;
@@ -100,6 +101,26 @@ public class DocumentRelationController {
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully fetched document relations by child document",
+                documentRelations
+        ));
+    }
+
+    @GetMapping("/predecessors/{documentId}/{relationType}")
+    public ResponseEntity getAllPredecessorsByRelationType(@PathVariable UUID documentId, @PathVariable ERelationType relationType) {
+        List<Document> documentRelations = documentRelationService.getAllPredecessorsByRelationType(documentId, relationType);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all predecessors by relation type",
+                documentRelations
+        ));
+    }
+
+    @GetMapping("/successors/{documentId}/{relationType}")
+    public ResponseEntity getAllSuccessorsByRelationType(@PathVariable UUID documentId, @PathVariable ERelationType relationType) {
+        List<Document> documentRelations = documentRelationService.getAllSuccessorsByRelationType(documentId, relationType);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully fetched all successors by relation type",
                 documentRelations
         ));
     }

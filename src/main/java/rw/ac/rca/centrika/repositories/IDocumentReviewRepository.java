@@ -18,4 +18,10 @@ public interface IDocumentReviewRepository extends JpaRepository<DocumentReview,
 
     @Query("SELECT DISTINCT dr FROM DocumentReview dr JOIN Reviewer r ON r.user.department = ?1 AND r.documentReview = dr")
     List<DocumentReview> findAllByReceivingDepartment(Department department);
+
+    @Query("SELECT DISTINCT dr FROM DocumentReview  dr WHERE dr.createdBy = ?1")
+    List<DocumentReview> getDocumentRequestedByMe(User user);
+
+    @Query("SELECT DISTINCT dr FROM DocumentReview  dr JOIN Reviewer r ON r.user = ?1 AND r.documentReview = dr")
+    List<DocumentReview> getDocumentsRequestedToMe(User user);
 }

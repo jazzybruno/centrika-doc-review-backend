@@ -53,7 +53,7 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
     @Override
     public DepartmentHead getDepartmentHeadById(UUID departmentHeadId) {
         try {
-            return departmentHeadRepository.findById(departmentHeadId).orElseThrow(() -> new InternalServerErrorException("Department head not found"));
+            return departmentHeadRepository.findById(departmentHeadId).orElseThrow(() -> new NotFoundException("Department head not found"));
         }catch (Exception e){
             throw new InternalServerErrorException("Error while getting department head by id");
         }
@@ -63,6 +63,11 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
     public DepartmentHead createDepartmentHead(CreateDepartmentHeadDTO departmentHeadDTO) {
         Department department = departmentRepository.findById(departmentHeadDTO.getDepartmentId()).orElseThrow(() -> new NotFoundException("Department not found"));
         User user = userRepository.findById(departmentHeadDTO.getUserId()).orElseThrow(() -> new NotFoundException("User not found"));
+
+        if(departmentHeadRepository.findDepartmentHeadByDepartmentIdAndUserId(department, user) != null){
+            throw new InternalServerErrorException("Department head already exists");
+        }
+
         departmentHead = new DepartmentHead();
         departmentHead.setDepartmentId(department);
         departmentHead.setUserId(user);
@@ -89,17 +94,20 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
             Role user_role = roleService.getRoleByName(EUserRole.USER);
             Set<Role> roles_user = new HashSet<Role>();
             roles_user.add(user_role);
-            user.setRoles(roles_user);
             usualDeptHead.setRoles(roles_user);
 
-            Role role = roleService.getRoleByName(EUserRole.DEPARTMENT_HEAD);
-            Set<Role> roles = new HashSet<Role>();
-            roles.add(role);
-            user.setRoles(roles);
-            user.setRoles(roles);
+            Role dept_role = roleService.getRoleByName(EUserRole.DEPARTMENT_HEAD);
+            Set<Role> dept_roles = new HashSet<Role>();
+            dept_roles.add(dept_role);
+            user.setRoles(dept_roles);
 
         departmentHead.setDepartmentId(department);
         departmentHead.setUserId(user);
+
+        userRepository.save(usualDeptHead);
+        userRepository.save(user);
+        departmentHeadRepository.save(departmentHead);
+
         return departmentHead;
         }catch (Exception e){
             throw new InternalServerErrorException("Error while updating department head");
@@ -123,6 +131,7 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
         try {
             return departmentHeadRepository.findDepartmentHeadByDepartmentId(department);
         }catch (Exception e){
+            e.printStackTrace();
             throw new InternalServerErrorException("Error while getting department head by department id");
         }
     }

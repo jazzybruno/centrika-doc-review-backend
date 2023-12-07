@@ -13,6 +13,8 @@ import rw.ac.rca.centrika.repositories.IDocumentRelationRepository;
 import rw.ac.rca.centrika.repositories.IDocumentRepository;
 import rw.ac.rca.centrika.services.DocumentRelationService;
 
+import javax.print.Doc;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +23,8 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     private final IDocumentRelationRepository documentRelationRepository;
     private final IDocumentRepository documentRepository;
     private DocumentRelation documentRelation;
+    private List<Document> documentRelationsPredecessors;
+    private List<Document> documentRelationsSuccessors;
 
     @Autowired
     public DocumentRelationServiceImpl(IDocumentRelationRepository documentRelationRepository, IDocumentRepository documentRepository) {
@@ -115,6 +119,76 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
             return documentRelationRepository.findAllByChildDocument(document);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    // a function that calls its self until the relations are finished
+    public void getAllPredecessor(Document parentDocument){
+        List<DocumentRelation> documentRelations = documentRelationRepository.findAllByChildDocument(parentDocument);
+        if(documentRelations.isEmpty()){
+            return;
+        }
+        if (documentRelations.size() == 1) {
+            documentRelationsPredecessors.add(documentRelations.get(0).getParentDocument());
+            getAllPredecessor(documentRelations.get(0).getParentDocument());
+        }else{
+            return;
+        }
+    }
+
+    @Override
+    public List<Document> getAllPredecessorsByRelationType(UUID documentId, ERelationType relationType) {
+        Document document = documentRepository.findById(documentId).orElseThrow(() -> new InternalServerErrorException("Document with id : " + documentId + "  not found"));
+        List<DocumentRelation> documentRelations = documentRelationRepository.findAllByChildDocumentOrParentDocumentAndRelationType(document , relationType);
+        if(documentRelations.isEmpty()){
+            return null;
+        }
+        documentRelationsPredecessors = new ArrayList<>();
+        if (documentRelations.size() == 1) {
+            if(documentRelations.get(0).getChildDocument().equals(document)){
+                documentRelationsPredecessors.add(documentRelations.get(0).getParentDocument());
+                return documentRelationsPredecessors;
+            }else{
+                 return null;
+            }
+        }else{
+            getAllPredecessor(documentRelations.get(0).getParentDocument());
+            return documentRelationsPredecessors;
+        }
+
+    }
+
+    public void getAllSuccessor(Document childDocument){
+        List<DocumentRelation> documentRelations = documentRelationRepository.findAllByParentDocument(childDocument);
+        if(documentRelations.isEmpty()){
+            return;
+        }
+        if (documentRelations.size() == 1) {
+            documentRelationsSuccessors.add(documentRelations.get(0).getChildDocument());
+            getAllSuccessor(documentRelations.get(0).getChildDocument());
+        }else{
+            return;
+        }
+    }
+
+    @Override
+    public List<Document> getAllSuccessorsByRelationType(UUID documentId, ERelationType relationType) {
+        Document document = documentRepository.findById(documentId).orElseThrow(() -> new InternalServerErrorException("Document with id : " + documentId + "  not found"));
+        List<DocumentRelation> documentRelations = documentRelationRepository.findAllByChildDocumentOrParentDocumentAndRelationType(document , relationType);
+        if(documentRelations.isEmpty()){
+            return null;
+        }
+        documentRelationsSuccessors = new ArrayList<>();
+        if (documentRelations.size() == 1) {
+            if(documentRelations.get(0).getParentDocument().equals(document)){
+                documentRelationsSuccessors.add(documentRelations.get(0).getChildDocument());
+                return documentRelationsSuccessors;
+            }else{
+                return null;
+            }
+        }else{
+            getAllSuccessor(documentRelations.get(0).getChildDocument());
+            return documentRelationsSuccessors;
         }
     }
 }
