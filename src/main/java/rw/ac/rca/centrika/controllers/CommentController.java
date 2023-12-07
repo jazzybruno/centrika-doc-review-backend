@@ -88,7 +88,7 @@ public class CommentController {
     // New methods added from CommentService
     @GetMapping("/review-action/{reviewActionId}")
     public ResponseEntity getCommentByReviewAction(@PathVariable UUID reviewActionId) {
-        List<Comment> comments = commentService.getCommentByReviewAction(reviewActionId);
+        Comment comments = commentService.getCommentByReviewAction(reviewActionId);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully fetched all the comments by review action",

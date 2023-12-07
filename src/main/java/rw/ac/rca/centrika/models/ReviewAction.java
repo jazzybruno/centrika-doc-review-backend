@@ -9,6 +9,7 @@ import rw.ac.rca.centrika.enumerations.EDocStatus;
 import rw.ac.rca.centrika.enumerations.EReviewStatus;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -30,6 +31,9 @@ public class ReviewAction {
 
     @Enumerated(EnumType.STRING)
     private EReviewStatus action;
+
+    @Transient
+    private Comment comment;
 
     private Date createdAt;
 

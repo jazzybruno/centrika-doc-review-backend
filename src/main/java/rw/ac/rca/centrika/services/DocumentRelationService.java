@@ -2,6 +2,7 @@ package rw.ac.rca.centrika.services;
 
 import rw.ac.rca.centrika.dtos.CreateDocumentRelationDTO;
 import rw.ac.rca.centrika.enumerations.ERelationType;
+import rw.ac.rca.centrika.models.Document;
 import rw.ac.rca.centrika.models.DocumentRelation;
 
 import java.util.List;
@@ -26,6 +27,6 @@ public interface DocumentRelationService {
 
     public List<DocumentRelation> getAllDocRelationByChildDocument(UUID documentId);
 
-     public List<DocumentRelation> getAllPredecessorsByRelationType(UUID documentId  , ERelationType relationType);
-     public List<DocumentRelation> getAllSuccessorsByRelationType(UUID documentId  , ERelationType relationType);
+     public List<Document> getAllPredecessorsByRelationType(UUID documentId  , ERelationType relationType);
+     public List<Document> getAllSuccessorsByRelationType(UUID documentId  , ERelationType relationType);
 }

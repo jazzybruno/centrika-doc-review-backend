@@ -1,5 +1,6 @@
 package rw.ac.rca.centrika.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,10 +22,14 @@ public class Comment {
     private String content;
     @Column(name = "created_at")
     private Date createdAt;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User commentCreator;
-    @ManyToOne
+
+    @JsonIgnore
+    @OneToOne
     @JoinColumn(name = "review_action_id")
     private ReviewAction reviewAction;
 

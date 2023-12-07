@@ -17,5 +17,4 @@ public class CreateReviewActionDTO {
     private UUID documentReviewId;
     private EReviewStatus action;
     private String comment;
-
 }

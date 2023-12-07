@@ -15,7 +15,7 @@ public interface CommentService {
     public Comment updateComment(UUID commentId , UpdateCommentDTO updateCommentDTO);
     public Comment deleteComment(UUID commentId);
     // other methods
-    public List<Comment> getCommentByReviewAction(UUID reviewActionId);
+    public Comment getCommentByReviewAction(UUID reviewActionId);
     public List<Comment> getCommentByUser();
     // other methods
 
