@@ -1,18 +1,18 @@
 package rw.ac.rca.centrika.services.serviceImpl;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rw.ac.rca.centrika.dtos.CreateReviewerDTO;
 import rw.ac.rca.centrika.exceptions.BadRequestAlertException;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
+import rw.ac.rca.centrika.models.Document;
 import rw.ac.rca.centrika.models.DocumentReview;
 import rw.ac.rca.centrika.models.Reviewer;
 import rw.ac.rca.centrika.models.User;
+import rw.ac.rca.centrika.repositories.IDocumentRepository;
 import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.repositories.IReviewerRepository;
-import rw.ac.rca.centrika.services.DocumentReviewService;
 import rw.ac.rca.centrika.services.ReviewerService;
 import rw.ac.rca.centrika.services.UserService;
 
@@ -22,14 +22,16 @@ import java.util.*;
 public class ReviewerServiceImplementor implements ReviewerService {
     private final IReviewerRepository reviewerRepository;
     private final IDocumentReviewRepository documentReviewRepository;
+    private final IDocumentRepository documentRepository;
     private final UserService userService;
     private final String documentReviewNotFound = "Document review not found";
     private final String reviewerNotFound = "Reviewer not found";
 
     @Autowired
-    public ReviewerServiceImplementor(IReviewerRepository reviewerRepository, IDocumentReviewRepository documentReviewRepository , UserService userService) {
+    public ReviewerServiceImplementor(IReviewerRepository reviewerRepository, IDocumentReviewRepository documentReviewRepository , IDocumentRepository documentRepository, UserService userService) {
         this.reviewerRepository = reviewerRepository;
         this.documentReviewRepository = documentReviewRepository;
+        this.documentRepository = documentRepository;
         this.userService = userService;
     }
 
@@ -134,6 +136,17 @@ public class ReviewerServiceImplementor implements ReviewerService {
         try {
             Optional<Reviewer>  optionalReviewer =  reviewerRepository.findByUserAndDocumentReview(user ,  documentReview);
             return optionalReviewer.orElse(null);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Reviewer> findByDocumentId(UUID documentId) {
+        Document document = documentRepository.findById(documentId).orElseThrow(()-> {throw new NotFoundException("The Document was not found");
+        });
+        try {
+            return reviewerRepository.findAllByDocument(document);
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }

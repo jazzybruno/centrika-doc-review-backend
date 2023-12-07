@@ -8,6 +8,7 @@ import rw.ac.rca.centrika.dtos.requests.CreateDocumentDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentDTO;
 import rw.ac.rca.centrika.enumerations.ECategory;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
+import rw.ac.rca.centrika.enumerations.ERelated;
 import rw.ac.rca.centrika.enumerations.ERelationType;
 import rw.ac.rca.centrika.exceptions.BadRequestAlertException;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
@@ -103,18 +104,20 @@ public class DocumentServiceImpl implements DocumentService {
         try {
               Document savedDoc = documentRepository.save(document);
 
-          //   if the document is a child document then we need to create a relation between the parent and the child
-            if(createDocumentDTO.getParentDocumentId().isEmpty() && createDocumentDTO.getRelationType().isEmpty()) {
-                // do nothing if there not present
-            } else {
-                ERelationType relationType = createDocumentDTO.getRelationType().get();
-                Document parentDocument = documentRepository.findById(createDocumentDTO.getParentDocumentId().get()).orElseThrow(() -> new NotFoundException("The parent document was not found"));
-                DocumentRelation documentRelation = new DocumentRelation();
-                documentRelation.setRelationType(relationType);
-                documentRelation.setParentDocument(parentDocument);
-                documentRelation.setChildDocument(savedDoc);
-                documentRelationRepository.save(documentRelation);
-            }
+          if(createDocumentDTO.getIsRelated().equals(ERelated.RELATED)){
+                  if(createDocumentDTO.getRelationType().isEmpty()){
+                      throw new BadRequestAlertException("The relation type is required");
+                  }
+                  if(createDocumentDTO.getParentDocumentId().isEmpty()){
+                      throw new BadRequestAlertException("The parent document is required");
+                  }
+                  Document parentDocument = documentRepository.findById(createDocumentDTO.getParentDocumentId().get()).orElseThrow(()-> {throw new NotFoundException("The parent document was not found");});
+                  DocumentRelation documentRelation = new DocumentRelation();
+                  documentRelation.setChildDocument(savedDoc);
+                  documentRelation.setParentDocument(parentDocument);
+                  documentRelation.setRelationType(createDocumentDTO.getRelationType().get());
+                  documentRelationRepository.save(documentRelation);
+              }
 
             return document;
           }catch (Exception e){

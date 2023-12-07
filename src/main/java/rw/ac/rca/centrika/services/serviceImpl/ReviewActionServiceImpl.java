@@ -1,10 +1,12 @@
 package rw.ac.rca.centrika.services.serviceImpl;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rw.ac.rca.centrika.dtos.CreateReviewActionDTO;
 import rw.ac.rca.centrika.dtos.UpdateReviewActionDTO;
 import rw.ac.rca.centrika.enumerations.EReviewStatus;
+import rw.ac.rca.centrika.enumerations.EReviewerStatus;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.*;
@@ -14,6 +16,7 @@ import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.repositories.IReviewActionRepository;
 import rw.ac.rca.centrika.services.*;
 
+import java.beans.Transient;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -59,6 +62,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
     }
 
     @Override
+    @Transactional
     public ReviewAction save(CreateReviewActionDTO reviewActionDTO) {
         Reviewer reviewer = reviewerService.findReviewerById(reviewActionDTO.getReviewerId());
         DocumentReview documentReview = documentReviewRepository.findById(reviewActionDTO.getDocumentReviewId()).orElseThrow(()-> {throw new NotFoundException("The Document review was not found");
@@ -69,6 +73,7 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
         reviewAction.setAction(reviewActionDTO.getAction());
 
         try {
+            reviewer.setStatus(EReviewerStatus.REVIEWED);
             ReviewAction action =  reviewActionRepository.save(reviewAction);
             // Creat the comment
             Comment comment = new Comment();
