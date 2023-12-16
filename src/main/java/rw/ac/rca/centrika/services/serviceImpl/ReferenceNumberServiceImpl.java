@@ -96,6 +96,7 @@ public class ReferenceNumberServiceImpl implements ReferenceNumberService {
         ReferenceNumber referenceNumber = getReferenceNumberById(referenceNumberId);
         try {
             referenceNumber.setStatus(status);
+            referenceNumber.setUpdatedAt(new Date());
             return referenceNumberRepository.save(referenceNumber);
         } catch (Exception e) {
             throw new InternalServerErrorException(e.getMessage());
@@ -107,6 +108,7 @@ public class ReferenceNumberServiceImpl implements ReferenceNumberService {
         ReferenceNumber referenceNumber = getReferenceNumberById(referenceNumberId);
         try {
             referenceNumber.setDestination(destination);
+            referenceNumber.setUpdatedAt(new Date());
             return referenceNumberRepository.save(referenceNumber);
         } catch (Exception e) {
             throw new InternalServerErrorException(e.getMessage());
