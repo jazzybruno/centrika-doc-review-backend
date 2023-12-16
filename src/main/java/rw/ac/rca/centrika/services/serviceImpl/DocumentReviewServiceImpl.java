@@ -91,6 +91,9 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                 CreateReviewerDTO createReviewerDTO = new CreateReviewerDTO();
                 createReviewerDTO.setDocumentReviewId(review.getId());
                 createReviewerDTO.setUserId(user);
+                if(user.equals(requestReviewDTO.getWhoHasFinalReview())){
+                    createReviewerDTO.setHasFinalReview(true);
+                }
                 reviewerService.createReviewer(createReviewerDTO);
                 User user1 = userService.getUserById(user);
                 String message = "You have a new document review from: " + createdBy.getUsername();

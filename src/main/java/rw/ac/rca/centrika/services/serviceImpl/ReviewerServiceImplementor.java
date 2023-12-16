@@ -66,6 +66,7 @@ public class ReviewerServiceImplementor implements ReviewerService {
                 reviewer.setDocumentReview(documentReview);
                 reviewer.setCreatedAt(new Date());
                 reviewer.setUpdatedAt(null);
+                reviewer.setHasFinalReview(createReviewerDTO.isHasFinalReview());
                 return reviewerRepository.save(reviewer);
             }else{
                 throw new BadRequestAlertException("Reviewer already reviewed this document");

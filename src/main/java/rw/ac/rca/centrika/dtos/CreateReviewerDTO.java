@@ -14,5 +14,5 @@ import java.util.UUID;
 public class CreateReviewerDTO {
     private UUID userId;
     private UUID documentReviewId;
-
+    private boolean hasFinalReview = false;
 }

@@ -35,6 +35,8 @@ public class Reviewer {
     @Enumerated(EnumType.STRING)
     private EReviewerStatus status = EReviewerStatus.PENDING;
 
+    private boolean hasFinalReview = false;
+
     public Reviewer(User user, Date createdAt, Date updatedAt) {
         this.user = user;
         this.createdAt = createdAt;
