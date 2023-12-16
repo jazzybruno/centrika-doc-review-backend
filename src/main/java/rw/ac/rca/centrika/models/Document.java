@@ -31,6 +31,10 @@ public class Document {
    @Enumerated(EnumType.STRING)
    private EDocStatus status;
 
+   // Checks to see of a document has predecessors or successors
+   private boolean hasPredecessors = false;
+    private boolean hasSuccessors = false;
+
    @OneToOne
    @JoinColumn(name = "reference_number_id")
    private ReferenceNumber referenceNumber;
