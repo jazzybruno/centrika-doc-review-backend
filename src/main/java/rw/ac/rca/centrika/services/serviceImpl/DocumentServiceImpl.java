@@ -100,7 +100,6 @@ public class DocumentServiceImpl implements DocumentService {
         document.setCreatedBy(user);
         document.setCreatedAt(new Date());
 
-
         try {
               Document savedDoc = documentRepository.save(document);
 

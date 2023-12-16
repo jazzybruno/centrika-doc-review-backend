@@ -104,6 +104,8 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                 );
                 notificationRepository.save(notification);
             }
+            // set the document status to pending
+            document.setStatus(EDocStatus.PENDING);
             return documentReview;
             }catch (Exception e){
                 throw new InternalServerErrorException(e.getMessage());
