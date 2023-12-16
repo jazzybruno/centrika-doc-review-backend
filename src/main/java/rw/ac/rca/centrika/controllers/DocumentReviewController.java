@@ -3,6 +3,7 @@ package rw.ac.rca.centrika.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rw.ac.rca.centrika.dtos.SetDeadlineDTO;
 import rw.ac.rca.centrika.dtos.requests.ForwardDocumentDTO;
 import rw.ac.rca.centrika.dtos.requests.RequestReviewDTO;
 import rw.ac.rca.centrika.dtos.requests.UpdateDocumentReviewDTO;
@@ -131,6 +132,16 @@ public class DocumentReviewController {
                 true,
                 "Successfully fetched document reviews by receiver department",
                 documentReviews
+        ));
+    }
+
+    @PatchMapping("/deadline/{documentReviewId}")
+    public ResponseEntity setDeadlineForReview(@PathVariable UUID documentReviewId , @RequestBody SetDeadlineDTO deadline) {
+        DocumentReview documentReview = documentReviewService.setDeadlineForReview(documentReviewId , deadline);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully set deadline for review",
+                documentReview
         ));
     }
 }
