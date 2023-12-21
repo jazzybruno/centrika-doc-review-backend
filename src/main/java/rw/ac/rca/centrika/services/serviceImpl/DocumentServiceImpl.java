@@ -70,6 +70,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Transactional
     public Document createDocument(MultipartFile docFile ,  CreateDocumentDTO createDocumentDTO) throws IOException {
         Document document = new Document();
         if(createDocumentDTO.getCategory().equals(ECategory.EXTERNAL)){
@@ -100,10 +101,8 @@ public class DocumentServiceImpl implements DocumentService {
         document.setCreatedBy(user);
         document.setCreatedAt(new Date());
 
-
         try {
               Document savedDoc = documentRepository.save(document);
-
           if(createDocumentDTO.getIsRelated().equals(ERelated.RELATED)){
                   if(createDocumentDTO.getRelationType().isEmpty()){
                       throw new BadRequestAlertException("The relation type is required");
@@ -114,7 +113,9 @@ public class DocumentServiceImpl implements DocumentService {
                   Document parentDocument = documentRepository.findById(createDocumentDTO.getParentDocumentId().get()).orElseThrow(()-> {throw new NotFoundException("The parent document was not found");});
                   DocumentRelation documentRelation = new DocumentRelation();
                   documentRelation.setChildDocument(savedDoc);
+                  savedDoc.setHasPredecessors(true);
                   documentRelation.setParentDocument(parentDocument);
+                    parentDocument.setHasSuccessors(true);
                   documentRelation.setRelationType(createDocumentDTO.getRelationType().get());
                   documentRelationRepository.save(documentRelation);
               }

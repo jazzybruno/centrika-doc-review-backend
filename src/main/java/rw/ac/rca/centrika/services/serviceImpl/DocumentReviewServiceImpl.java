@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import rw.ac.rca.centrika.dtos.CreateReviewActionDTO;
 import rw.ac.rca.centrika.dtos.CreateReviewerDTO;
+import rw.ac.rca.centrika.dtos.SetDeadlineDTO;
 import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
 import rw.ac.rca.centrika.enumerations.EReviewStatus;
@@ -15,6 +16,7 @@ import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
 import rw.ac.rca.centrika.models.*;
 import rw.ac.rca.centrika.repositories.ICommentRepository;
+import rw.ac.rca.centrika.repositories.IDepartmentHeadRepository;
 import rw.ac.rca.centrika.repositories.IDocumentReviewRepository;
 import rw.ac.rca.centrika.repositories.INotificationRepository;
 import rw.ac.rca.centrika.services.DepartmentService;
@@ -36,8 +38,9 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     private ReviewerService reviewerService;
     private DepartmentService departmentService;
     private ReviewActionService reviewActionService;
+    private IDepartmentHeadRepository departmentHeadRepository;
     @Autowired
-    public DocumentReviewServiceImpl(ReviewActionService reviewActionService , DepartmentService departmentService , IDocumentReviewRepository documentReviewRepository , ReviewerService reviewerService, DocumentServiceImpl documentService, UserServiceImpl userService , INotificationRepository notificationRepository ,  ICommentRepository commentRepository) {
+    public DocumentReviewServiceImpl(IDepartmentHeadRepository departmentHeadRepository , ReviewActionService reviewActionService , DepartmentService departmentService , IDocumentReviewRepository documentReviewRepository , ReviewerService reviewerService, DocumentServiceImpl documentService, UserServiceImpl userService , INotificationRepository notificationRepository ,  ICommentRepository commentRepository) {
         this.documentReviewRepository = documentReviewRepository;
         this.documentService = documentService;
         this.userService = userService;
@@ -46,6 +49,7 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         this.reviewerService = reviewerService;
         this.departmentService = departmentService;
         this.reviewActionService = reviewActionService;
+        this.departmentHeadRepository = departmentHeadRepository;
     }
 
     @Override
@@ -87,6 +91,9 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                 CreateReviewerDTO createReviewerDTO = new CreateReviewerDTO();
                 createReviewerDTO.setDocumentReviewId(review.getId());
                 createReviewerDTO.setUserId(user);
+                if(user.equals(requestReviewDTO.getWhoHasFinalReview())){
+                    createReviewerDTO.setHasFinalReview(true);
+                }
                 reviewerService.createReviewer(createReviewerDTO);
                 User user1 = userService.getUserById(user);
                 String message = "You have a new document review from: " + createdBy.getUsername();
@@ -97,6 +104,8 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
                 );
                 notificationRepository.save(notification);
             }
+            // set the document status to pending
+            document.setStatus(EDocStatus.PENDING);
             return documentReview;
             }catch (Exception e){
                 throw new InternalServerErrorException(e.getMessage());
@@ -224,6 +233,30 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         Department department = departmentService.getDepartmentById(receiverDepartmentId);
         try {
             return documentReviewRepository.findAllByReceivingDepartment(department);
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public DocumentReview setDeadlineForReview(UUID documentReviewId, SetDeadlineDTO deadline) {
+        DocumentReview documentReview = this.getDocumentReviewById(documentReviewId);
+        List<Reviewer> reviewers = reviewerService.findByDocumentReviewId(documentReviewId);
+        DepartmentHead departmentHead = departmentHeadRepository.findById(deadline.getDepartmentHeadId()).orElseThrow(() -> {throw new NotFoundException("The department head was not found");
+        });
+        try {
+            documentReview.setDeadline(deadline.getDeadline());
+            for (Reviewer reviewer : reviewers) {
+                User user = reviewer.getUser();
+                String message = "The deadline for the review of the document: " + documentReview.getDocument().getTitle() + " was set to: " + deadline;
+                Notification notification = new Notification(
+                        departmentHead.getUserId(),
+                        user,
+                        message
+                );
+                notificationRepository.save(notification);
+            }
+            return documentReview;
         }catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }

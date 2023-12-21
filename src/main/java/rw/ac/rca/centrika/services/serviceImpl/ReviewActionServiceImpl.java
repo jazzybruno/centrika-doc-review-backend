@@ -84,6 +84,16 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
 
         try {
             reviewer.setStatus(EReviewerStatus.REVIEWED);
+            if(reviewer.isHasFinalReview()){
+                switch (reviewActionDTO.getAction()){
+                    case APPROVE:
+                        documentReview.getDocument().setStatus(EDocStatus.APPROVED);
+                        break;
+                    case RETURN:
+                        documentReview.getDocument().setStatus(EDocStatus.RETURNED);
+                        break;
+                }
+            }
             ReviewAction action =  reviewActionRepository.save(reviewAction);
             // Creat the comment
             Comment comment = new Comment();
@@ -102,12 +112,6 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
             notification.setSender(reviewer.getUser());
             notification.setReceiver(documentReview.getCreatedBy());
             notificationRepository.save(notification);
-
-            if(reviewActionDTO.getAction() == EReviewStatus.APPROVE){
-                documentReview.getDocument().setStatus(EDocStatus.APPROVED);
-            }else if(reviewActionDTO.getAction() == EReviewStatus.RETURN){
-                documentReview.getDocument().setStatus(EDocStatus.RETURNED);
-            }
 
             return action;
         }catch (Exception e){

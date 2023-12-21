@@ -22,4 +22,5 @@ public class RequestReviewDTO {
     public UUID createdBy;
     public Date expectedCompleteTime;
     public List<UUID> reviewers;
+    public UUID whoHasFinalReview;
 }

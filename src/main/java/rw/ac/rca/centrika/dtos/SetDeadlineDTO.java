@@ -5,14 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.xml.crypto.Data;
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateReviewerDTO {
-    private UUID userId;
-    private UUID documentReviewId;
-    private boolean hasFinalReview = false;
+public class SetDeadlineDTO {
+    private Date deadline;
+    private String message;
+    private UUID departmentHeadId;
 }
