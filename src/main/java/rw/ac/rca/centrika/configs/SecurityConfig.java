@@ -43,6 +43,34 @@ public class SecurityConfig {
 	private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
 	private final CustomUserDetailsService userService;
+//	private static final String[] AUTH_WHITELIST = {
+//			"/swagger-resources/**",
+//			"/configuration/ui",
+//			"/configuration/security",
+//			"/swagger-ui/**",
+//			"/webjars/**",
+//			"/swagger-ui.html",
+//			"/v3/api-docs/**",
+//			"/actuator/*",
+//			"/api/auth/login",
+//			"/api/auth/initiate-password-reset",
+//			"/api/auth/verify-email",
+//			"/api/auth/reset-password",
+//			"/api/users/create-admin",
+//			"/api/comments/**",
+//			"/api/department/**",
+//			"/api/department-heads/**",
+//			"/api/documents/**",
+//			"/api/document-relations/**",
+//			"/api/document-reviews/**",
+//			"/api/notifications/**",
+//			"/api/reference-numbers/**",
+//			"/api/review-actions/**",
+//			"/api/reviewers/**",
+//			"/api/users/**"
+//
+//	};
+
 	private static final String[] AUTH_WHITELIST = {
 			"/swagger-resources/**",
 			"/configuration/ui",
@@ -52,23 +80,7 @@ public class SecurityConfig {
 			"/swagger-ui.html",
 			"/v3/api-docs/**",
 			"/actuator/*",
-			"/api/auth/login",
-			"/api/auth/initiate-password-reset",
-			"/api/auth/verify-email",
-			"/api/auth/reset-password",
-			"/api/users/create-admin",
-			"/api/comments/**",
-			"/api/department/**",
-			"/api/department-heads/**",
-			"/api/documents/**",
-			"/api/document-relations/**",
-			"/api/document-reviews/**",
-			"/api/notifications/**",
-			"/api/reference-numbers/**",
-			"/api/review-actions/**",
-			"/api/reviewers/**",
-			"/api/users/**"
-
+			"/api/auth/**"
 	};
 
 	@Bean
