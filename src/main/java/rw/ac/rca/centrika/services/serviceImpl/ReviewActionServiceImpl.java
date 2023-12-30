@@ -76,6 +76,13 @@ public class ReviewActionServiceImpl  implements ReviewActionService {
         Reviewer reviewer = reviewerService.findReviewerById(reviewActionDTO.getReviewerId());
         DocumentReview documentReview = documentReviewRepository.findById(reviewActionDTO.getDocumentReviewId()).orElseThrow(()-> {throw new NotFoundException("The Document review was not found");
         });
+
+        // check and see if the deadline has reached
+        if(documentReview.getDeadline().before(new Date())){
+            reviewer.setStatus(EReviewerStatus.INVALID);
+            throw new InternalServerErrorException("The deadline has reached for this document review");
+        }
+
         ReviewAction reviewAction = new ReviewAction();
         reviewAction.setReviewer(reviewer);
         reviewAction.setDocumentReview(documentReview);

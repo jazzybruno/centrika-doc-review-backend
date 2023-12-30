@@ -79,7 +79,6 @@ public class SecurityConfig {
 			ServletOutputStream out = response.getOutputStream();
 			new ObjectMapper().writeValue(out, new ApResponse<String>("Invalid or missing auth token." +
 					"",  (Object) "", HttpStatus.UNAUTHORIZED));
-
 			out.flush();
 		};
 	}
@@ -109,6 +108,13 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.csrf(AbstractHttpConfigurer::disable)
+				.cors((cors) -> cors.configurationSource(request -> {
+					CorsConfiguration corsConfiguration = new CorsConfiguration();
+					corsConfiguration.addAllowedOrigin("*");
+					corsConfiguration.addAllowedMethod("*");
+					corsConfiguration.addAllowedHeader("*");
+					return corsConfiguration;
+				}))
 				.authorizeHttpRequests(request -> request
 						.requestMatchers(AUTH_WHITELIST).permitAll()
 						.anyRequest().authenticated())
