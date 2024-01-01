@@ -123,13 +123,7 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.csrf(AbstractHttpConfigurer::disable)
-				.cors((cors) -> cors.configurationSource(request -> {
-					CorsConfiguration corsConfiguration = new CorsConfiguration();
-					corsConfiguration.addAllowedOrigin("*");
-					corsConfiguration.addAllowedMethod("*");
-					corsConfiguration.addAllowedHeader("*");
-					return corsConfiguration;
-				}))
+				.cors(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(request -> request
 						.requestMatchers(AUTH_WHITELIST).permitAll()
 						.anyRequest().authenticated())
