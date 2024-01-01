@@ -3,10 +3,7 @@ package rw.ac.rca.centrika.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import rw.ac.rca.centrika.dtos.requests.CreateAdminDTO;
-import rw.ac.rca.centrika.dtos.requests.CreateUserDTO;
-import rw.ac.rca.centrika.dtos.requests.UpdateUserDTO;
-import rw.ac.rca.centrika.dtos.requests.UpdateUserDepartmentDTO;
+import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.services.UserService;
 import rw.ac.rca.centrika.utils.ApResponse;
@@ -67,13 +64,35 @@ public class UserController {
         ));
     }
 
-    @PostMapping("/create")
+    @PostMapping("/create-invite-user")
     public ResponseEntity createUser(@RequestBody CreateUserDTO createUserDTO) {
         User user = userService.createUser(createUserDTO);
         return ResponseEntity.ok().body(new ApiResponse(
                 true,
                 "Successfully created the user",
                 user
+        ));
+    }
+
+    // inviting and creating the user
+    @PostMapping("/create")
+    public ResponseEntity inviteUser(@RequestBody InviteUserDTO inviteUserDTO) {
+        User user = userService.inviteUser(inviteUserDTO);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully invited the user",
+                user
+        ));
+    }
+
+    // code validation
+    @GetMapping("/is-code-valid")
+    public ResponseEntity validateUser(@RequestParam String email , @RequestParam String token) {
+        boolean isValid = userService.isUserInvited(email, token);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully validated the user",
+                isValid
         ));
     }
 

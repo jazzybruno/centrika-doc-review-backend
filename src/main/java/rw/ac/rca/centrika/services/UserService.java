@@ -1,9 +1,6 @@
 package rw.ac.rca.centrika.services;
 
-import rw.ac.rca.centrika.dtos.requests.CreateAdminDTO;
-import rw.ac.rca.centrika.dtos.requests.CreateUserDTO;
-import rw.ac.rca.centrika.dtos.requests.UpdateUserDTO;
-import rw.ac.rca.centrika.dtos.requests.UpdateUserDepartmentDTO;
+import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.models.User;
 
 import java.util.List;
@@ -19,4 +16,8 @@ public interface UserService {
     public User deleteUser(UUID userId);
     public User changeDepartment(UpdateUserDepartmentDTO updateUserDepartmentDTO);
     public List<User> getUsersByDeptId(UUID deptId);
+
+    // inviting the user
+    public User inviteUser(InviteUserDTO inviteUserDTO);
+    public boolean isUserInvited(String email , String token);
 }

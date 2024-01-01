@@ -10,6 +10,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import rw.ac.rca.centrika.enumerations.EGender;
 import rw.ac.rca.centrika.enumerations.EStatus;
+import rw.ac.rca.centrika.utils.ExpirationTokenUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -33,6 +34,12 @@ public class User {
 
     // personal details
     private String username;
+    private String firstName;
+    private String lastName;
+    @Transient
+    private String fullName = firstName + " " + lastName;
+    private String nationalId;
+    private Date dateOfBirth;
     @Column(name = "phone_number")
     private String phoneNumber;
     @Column (name = "email")
@@ -57,12 +64,11 @@ public class User {
     private String password;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private EStatus status;
+    private EStatus status = EStatus.WAIT_EMAIL_VERIFICATION;
     @Column(name = "verified")
     private boolean verified;
-
     @Column
-    private String token;
+    private String expirationToken = ExpirationTokenUtils.generateToken();
 
     // Relationships details
 
@@ -91,5 +97,11 @@ public class User {
         this.status = status;
         this.verified = verified;
         this.activationCode =  activationCode;
+    }
+
+    // inviting user
+    public User(String username , String email , Department department){
+        this.username = username;
+        this.email = email;
     }
 }

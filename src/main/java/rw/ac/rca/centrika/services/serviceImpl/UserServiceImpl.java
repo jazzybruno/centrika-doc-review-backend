@@ -5,10 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import rw.ac.rca.centrika.dtos.requests.CreateAdminDTO;
-import rw.ac.rca.centrika.dtos.requests.CreateUserDTO;
-import rw.ac.rca.centrika.dtos.requests.UpdateUserDTO;
-import rw.ac.rca.centrika.dtos.requests.UpdateUserDepartmentDTO;
+import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.enumerations.ECategory;
 import rw.ac.rca.centrika.enumerations.EStatus;
 import rw.ac.rca.centrika.enumerations.EUserRole;
@@ -21,7 +18,9 @@ import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.repositories.IDepartmentRepository;
 import rw.ac.rca.centrika.repositories.IUserRepository;
 import rw.ac.rca.centrika.security.UserPrincipal;
+import rw.ac.rca.centrika.services.MailService;
 import rw.ac.rca.centrika.services.UserService;
+import rw.ac.rca.centrika.utils.ExpirationTokenUtils;
 import rw.ac.rca.centrika.utils.HashUtil;
 import rw.ac.rca.centrika.utils.UserUtils;
 import rw.ac.rca.centrika.utils.Utility;
@@ -37,11 +36,17 @@ public class UserServiceImpl implements UserService {
     @Value("${adminKey}")
     private String adminKey;
 
+    @Value("${invitation.valid.days}")
+    private int validityDays;
+
+    private final MailService mailService;
+
     @Autowired
-    public UserServiceImpl(IUserRepository iUserRepository, IDepartmentRepository iDepartmentRepository, RoleServiceImpl roleService  ) {
+    public UserServiceImpl(IUserRepository iUserRepository, IDepartmentRepository iDepartmentRepository, RoleServiceImpl roleService, MailService mailService) {
         this.userRepository = iUserRepository;
         this.departmentRepository = iDepartmentRepository;
         this.roleService = roleService;
+        this.mailService = mailService;
     }
 
     @Override
@@ -62,36 +67,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User createUser(CreateUserDTO createUserDTO) {
-        Optional<User> optionalUser = userRepository.findUserByEmailOrPhoneNumber(createUserDTO.getEmail() , createUserDTO.getPhoneNumber());
-        if(optionalUser.isEmpty()){
-                Department department = departmentRepository.findById(createUserDTO.getDepartmentId()).orElseThrow(()-> {throw new NotFoundException("the Department was not found");});
-                String activationCode = Utility.randomUUID(6 , 0 , 'N');
-                EStatus status =  EStatus.WAIT_EMAIL_VERIFICATION;
-                Role role = roleService.getRoleByName(EUserRole.USER);
-                createUserDTO.setPassword(HashUtil.hashPassword(createUserDTO.getPassword()));
-                User user = new User(
-                   createUserDTO.getUsername(),
-                   createUserDTO.getPhoneNumber(),
-                   createUserDTO.getEmail(),
-                   createUserDTO.getGender(),
-                   createUserDTO.getPassword(),
-                   status,
-                   false,
-                   activationCode
-                );
-                Set<Role> roles = new HashSet<Role>();
-                roles.add(role);
-                user.setRoles(roles);
-                user.setDepartment(department);
-                try {
-                    userRepository.save(user);
-                    return user;
-                }catch (Exception e){
-                    throw new  InternalServerErrorException(e.getMessage());
-                }
+        try {
+        User user = userRepository.findUserByEmail(createUserDTO.getEmail()).orElseThrow(()-> new NotFoundException("The user with the given email was not found"));
+        if(user.getStatus().equals(EStatus.NO_PROFILE)){
+            user.setFirstName(createUserDTO.getFirstName());
+            user.setLastName(createUserDTO.getLastName());
+            user.setNationalId(createUserDTO.getNationalId());
+            user.setDateOfBirth(createUserDTO.getDateOfBirth());
+            user.setGender(createUserDTO.getGender());
+            user.setPhoneNumber(createUserDTO.getPhoneNumber());
+            user.setStatus(EStatus.ACTIVE);
+            user.setEmail(createUserDTO.getEmail());
+            user.setUsername(createUserDTO.getUsername());
+            user.setPassword(HashUtil.hashPassword(createUserDTO.getPassword()));
+            return user;
         }else{
-            throw new BadRequestAlertException("The User with the provided email or phone Already Exists");
+            throw new BadRequestAlertException("Invalid invitation please first validated the invitation");
+        }
+        }catch (Exception e){
+            throw new  InternalServerErrorException(e.getMessage());
         }
     }
 
@@ -114,10 +110,15 @@ public class UserServiceImpl implements UserService {
                         false,
                         activationCode
                 );
+                user.setLastName(createAdminDTO.getLastName());
+                user.setFirstName(createAdminDTO.getFirstName());
+                user.setNationalId(createAdminDTO.getNationalId());
+                user.setDateOfBirth(createAdminDTO.getDateOfBirth());
                 Set<Role> roles = new HashSet<Role>();
                 roles.add(role);
                 user.setRoles(roles);
                 try {
+                    mailService.sendAccountVerificationEmail(user);
                     userRepository.save(user);
                     return user;
                 }catch (Exception e){
@@ -184,6 +185,58 @@ public class UserServiceImpl implements UserService {
         try {
             return userRepository.findAllByDepartment(department);
         }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public User inviteUser(InviteUserDTO inviteUserDTO) {
+        try {
+            User userByEmail = userRepository.findUserByEmail(inviteUserDTO.getEmail()).orElse(null);
+            if(userByEmail != null){
+                throw new BadRequestAlertException("The user with the given email already exists");
+            }
+            User userEntity = new User();
+            userEntity.setEmail(inviteUserDTO.getEmail());
+            userEntity.setUsername(inviteUserDTO.getUsername());
+            Role role = roleService.getRoleByName(EUserRole.USER);
+            userEntity.getRoles().add(role);
+            userEntity.setStatus(EStatus.DISABLED);
+            mailService.sendInvitationEmail(userEntity);
+            userRepository.save(userEntity);
+            return userEntity;
+        }catch (BadRequestAlertException e){
+            throw new BadRequestAlertException(e.getMessage());
+        }catch (NotFoundException e){
+            throw new NotFoundException(e.getMessage());
+        }
+        catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean isUserInvited(String email, String token) {
+        try {
+            User user = userRepository.findUserByEmail(email).orElseThrow(()-> new NotFoundException("The user with the given email was not found"));
+            String expirationToken = user.getExpirationToken();
+            if(expirationToken == null){
+                throw new BadRequestAlertException("Invalid invitation please first validated the invitation");
+            }
+            if(!token.equals(expirationToken)) {
+                throw new BadRequestAlertException("Invalid invitation please first validated the invitation");
+            }
+            boolean isValid = ExpirationTokenUtils.isTokenValid(expirationToken, validityDays);
+            if(isValid){
+                user.setStatus(EStatus.NO_PROFILE);
+            }
+            return isValid;
+        }catch (BadRequestAlertException e){
+            throw new BadRequestAlertException(e.getMessage());
+        }catch (NotFoundException e){
+            throw new NotFoundException(e.getMessage());
+        }
+        catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
         }
     }

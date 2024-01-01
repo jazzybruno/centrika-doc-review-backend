@@ -24,7 +24,7 @@ public class MailService {
     @Value("${spring.mail.username}")
     private String appEmail;
 
-    @Value("${swagger.app_name}")
+    @Value("${app_name}")
     private String appName;
 
     @Value("${client.host}")
