@@ -28,21 +28,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        try {
-            String jwt = getJwtFromRequest(httpServletRequest);
-            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                String userID = tokenProvider.getUserIdFromToken(jwt);
-                UserDetails userDetails = customUserDetailsService.loadByUserId(UUID.fromString(userID));
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        if(httpServletRequest.getMethod().equals("OPTIONS")){
+            httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+        }else{
+            try {
+                String jwt = getJwtFromRequest(httpServletRequest);
+                if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+                    String userID = tokenProvider.getUserIdFromToken(jwt);
+                    UserDetails userDetails = customUserDetailsService.loadByUserId(UUID.fromString(userID));
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
+            } catch (Exception e) {
+                logger.error("Could not set user authentication in security context", e);
             }
-        } catch (Exception e) {
-            logger.error("Could not set user authentication in security context", e);
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
         }
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
