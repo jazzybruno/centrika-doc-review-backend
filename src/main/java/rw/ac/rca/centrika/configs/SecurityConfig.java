@@ -106,15 +106,16 @@ public class SecurityConfig {
 		};
 	}
 
-//	@Bean
-//	CorsConfigurationSource corsConfigurationSource() {
-//		CorsConfiguration configuration = new CorsConfiguration();
-//		configuration.setAllowedOrigins(Arrays.asList("*")); // Allow all origins
-//		configuration.setAllowedMethods(Arrays.asList("*")); // Allow all methods
-//		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//		source.registerCorsConfiguration("/**", configuration);
-//		return source;
-//	}
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.addAllowedHeader("*"); // Allow all origins
+		configuration.addAllowedOrigin("*"); // Allow all methods
+		configuration.addAllowedMethod("*"); // Allow all methods
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
