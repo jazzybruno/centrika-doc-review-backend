@@ -3,6 +3,7 @@ package rw.ac.rca.centrika.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import rw.ac.rca.centrika.dtos.requests.ResetPasswordDTO;
 import rw.ac.rca.centrika.dtos.requests.SignInDTO;
 import rw.ac.rca.centrika.dtos.requests.VerifyEmailDTO;
+import rw.ac.rca.centrika.dtos.responses.ProfileResponseDTO;
 import rw.ac.rca.centrika.models.User;
 import rw.ac.rca.centrika.security.JwtTokenProvider;
 import rw.ac.rca.centrika.security.UserPrincipal;
+import rw.ac.rca.centrika.services.AuthenticationService;
 import rw.ac.rca.centrika.services.serviceImpl.EmailService;
 import rw.ac.rca.centrika.services.serviceImpl.UserServiceImpl;
 import rw.ac.rca.centrika.utils.*;
@@ -27,6 +30,7 @@ import rw.ac.rca.centrika.utils.*;
 @RequestMapping (path = "/api/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
+    private final AuthenticationService authenticationService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UserServiceImpl userService;
@@ -36,7 +40,8 @@ public class AuthenticationController {
     private final AuthenticationProvider authenticationProvider;
     private static final String BASE_URL = "https://example.com/reset-password";
     @Autowired
-    public AuthenticationController(JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager , UserServiceImpl userService , EmailService emailService , AuthenticationProvider authenticationProvider) {
+    public AuthenticationController(AuthenticationService authenticationService, JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager , UserServiceImpl userService , EmailService emailService , AuthenticationProvider authenticationProvider) {
+        this.authenticationService = authenticationService;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
@@ -49,7 +54,6 @@ public class AuthenticationController {
         String jwt = null;
         UserPrincipal userPrincipal = null;
         User user = null;
-        System.out.println("I am in the authentication api");
         // Create a UsernamePasswordAuthenticationToken
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(signInDTO.getEmail(), signInDTO.getPassword());
 
@@ -70,119 +74,155 @@ public class AuthenticationController {
         ));
     }
 
-    @PostMapping("/initiate-password-reset")
-    @Transactional
-    public ResponseEntity<ApiResponse> initiatePasswordReset(@RequestParam String email) {
-        // Check if the email exists in your user database
-         User user = userService.getUserByEmail(email);
-         if(user != null){
-             String token = TokenUtility.generateToken();
-             user.setToken(token);
-             // Generate a unique token for password reset
-             String passwordResetLink = generatePasswordResetLink(user.getEmail() , user.getToken());
-              try {
-                 emailService.sendPasswordResetEmail(user , passwordResetLink);
-                  return ResponseEntity.ok().body(new ApiResponse(
-                          true ,
-                          "Initiate password reset was a success"
-                  ));
-              }catch (Exception e){
-                  return ResponseEntity.internalServerError().body(new ApiResponse(
-                          false,
-                          e.getMessage()
-                  ));
-              }
-         }else{
-             return ResponseEntity.badRequest().body(new ApiResponse(
-                     false ,
-                     "The account is not present"
-             ));
-         }
-    }
+    @PostMapping("/verify-account")
+    public ResponseEntity<ApiResponse> verifyAccount(@RequestParam String email, @RequestParam String code) {
+        try {
+            // Call the verify account service method
+            boolean verificationStatus = authenticationService.verifyAccount(email, code);
 
-    @GetMapping("/verify-email")
-    @Transactional
-    public ResponseEntity<ApiResponse> verifyEmail(@RequestBody VerifyEmailDTO verifyEmailDTO) {
-        User user = userService.getUserByEmail(verifyEmailDTO.getEmail());
-        if(user == null){
-            if(TokenUtility.isTokenValid(verifyEmailDTO.getCode() , tokenExpirationTimeMillis)){
-                if(user.getToken().equals(verifyEmailDTO.getCode())){
-                    user.setToken(null);
-                    user.setVerified(true);
-                    return ResponseEntity.ok().body(new ApiResponse(
-                            true ,
-                            "Email verified successfully."
-                    ));
-                }else{
-                    return ResponseEntity.badRequest().body(new ApiResponse(
-                            false ,
-                            "The token is incorrect"
-                    ));
-                }
-            }else{
-                return ResponseEntity.badRequest().body(new ApiResponse(
-                        false ,
-                        "The token is invalid"
-                ));
+            // Return a response based on the verification status
+            if (verificationStatus) {
+                return new ResponseEntity<>(new ApiResponse(
+                        true,
+                        "Account verification successful",
+                        null
+                ), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ApiResponse(
+                        false,
+                        "Account verification failed",
+                        null
+                ), HttpStatus.BAD_REQUEST);
             }
-        }else{
-            return ResponseEntity.badRequest().body(new ApiResponse(
-                    false ,
-                    "The account is not present"
-            ));
+        } catch (Exception e) {
+            // Handle exceptions and return an appropriate response
+            return ExceptionUtils.handleControllerExceptions(e);
         }
     }
 
+    @PostMapping("/verify-reset-code")
+    public ResponseEntity<ApiResponse> verifyResetCode(@RequestParam String email, @RequestParam String code) {
+        try {
+            // Call the verify reset code service method
+            boolean verificationStatus = authenticationService.verifyResetCode(email, code);
+
+            // Return a response based on the verification status
+            if (verificationStatus) {
+                return new ResponseEntity<>(new ApiResponse(
+                        true,
+                        "Reset code verification successful",
+                        null
+                ), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ApiResponse(
+                        false,
+                        "Reset code verification failed",
+                        null
+                ), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            // Handle exceptions and return an appropriate response
+            return ExceptionUtils.handleControllerExceptions(e);
+        }
+    }
+
+    // Add other methods for reset password, resend verification code, reset password, etc.
+    // Example:
+    @PostMapping("/resend-verification-code")
+    public ResponseEntity<ApiResponse> resendVerificationCode(@RequestParam String email) {
+        try {
+            // Call the resend verification code service method
+            User user = authenticationService.resendVerificationCode(email);
+
+            // Return a response based on the user
+            if (user != null) {
+                return new ResponseEntity<>(new ApiResponse(
+                        true,
+                        "Verification code resent successfully",
+                        null
+                ), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ApiResponse(
+                        false,
+                        "Resend verification code failed",
+                        null
+                ), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            // Handle exceptions and return an appropriate response
+            return ExceptionUtils.handleControllerExceptions(e);
+        }
+    }
+
+    @PostMapping("/initiate-reset-password")
+    public ResponseEntity<ApiResponse> initiateResetPassword(@RequestParam String email) {
+        try {
+            // Call the initiate reset password service method
+            User user = authenticationService.initiatePasswordReset(email);
+
+            // Return a response based on the user
+            if (user != null) {
+                return new ResponseEntity<>(new ApiResponse(
+                        true,
+                        "Password reset initiated successfully",
+                        null
+                ), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ApiResponse(
+                        false,
+                        "Password reset initiation failed",
+                        null
+                ), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            // Handle exceptions and return an appropriate response
+            return ExceptionUtils.handleControllerExceptions(e);
+        }
+    }
 
     @PostMapping("/reset-password")
-    @Transactional
     public ResponseEntity<ApiResponse> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
-        User user = userService.getUserByEmail(resetPasswordDTO.getEmail());
-        if(user == null){
-            if(TokenUtility.isTokenValid(resetPasswordDTO.getCode() , tokenExpirationTimeMillis)){
-                if(user.getToken().equals(resetPasswordDTO.getCode())){
-                    user.setToken(null);
-                     String hashedPassword = HashUtil.hashPassword(resetPasswordDTO.getNewPassword());
-                     user.setPassword(hashedPassword);
-                    return ResponseEntity.badRequest().body(new ApiResponse(
-                            false ,
-                            "Password reset successfully"
-                    ));
-                }else{
-                    return ResponseEntity.badRequest().body(new ApiResponse(
-                            false ,
-                            "The token is incorrect"
-                    ));
-                }
-            }else{
-                return ResponseEntity.badRequest().body(new ApiResponse(
-                        false ,
-                        "The token is invalid"
-                ));
+        try {
+            // Call the reset password service method
+            User user = authenticationService.resetPassword(resetPasswordDTO);
+
+            // Return a response based on the user
+            if (user != null) {
+                return new ResponseEntity<>(new ApiResponse(
+                        true,
+                        "Password reset successfully",
+                        null
+                ), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ApiResponse(
+                        false,
+                        "Password reset failed",
+                        null
+                ), HttpStatus.BAD_REQUEST);
             }
-        }else{
-            return ResponseEntity.badRequest().body(new ApiResponse(
-                    false ,
-                    "The account is not present"
-            ));
+        } catch (Exception e) {
+            // Handle exceptions and return an appropriate response
+            return ExceptionUtils.handleControllerExceptions(e);
         }
     }
 
-    @GetMapping("/get-profile")
-    public ResponseEntity<ApiResponse> getLoggedInProfile(){
-        if(UserUtils.isUserLoggedIn()){
-            UserPrincipal userPrincipal = UserUtils.getLoggedInUser();
-            User user = userService.getUserById(userPrincipal.getId());
-            return ResponseEntity.ok().body(new ApiResponse(
+    // Add other methods for reset password, resend verification code, reset password, etc.
+    // Example:
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse> getUserProfile() {
+        try {
+            // Call the get user profile service method
+            ProfileResponseDTO profileResponseDTO = authenticationService.getUserProfile();
+
+            // Return a response based on the user
+            return new ResponseEntity<>(new ApiResponse(
                     true,
-                    "Successfully fetched the logged in user",
-                    user
-            ));
-        }else{
-             return ResponseEntity.status(401).body(new ApiResponse(
-                     false,
-                     "You are not authorized"
-             ));
+                    "User profile retrieved successfully",
+                    profileResponseDTO
+            ), HttpStatus.OK);
+        } catch (Exception e) {
+            // Handle exceptions and return an appropriate response
+            return ExceptionUtils.handleControllerExceptions(e);
         }
     }
 

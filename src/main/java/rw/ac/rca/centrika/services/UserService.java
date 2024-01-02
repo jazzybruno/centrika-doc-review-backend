@@ -20,4 +20,5 @@ public interface UserService {
     // inviting the user
     public User inviteUser(InviteUserDTO inviteUserDTO);
     public boolean isUserInvited(String email , String token);
+    public User getLoggedInUser();
 }

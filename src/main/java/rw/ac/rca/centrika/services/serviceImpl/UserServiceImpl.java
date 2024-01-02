@@ -3,6 +3,8 @@ package rw.ac.rca.centrika.services.serviceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rw.ac.rca.centrika.dtos.requests.*;
@@ -12,6 +14,7 @@ import rw.ac.rca.centrika.enumerations.EUserRole;
 import rw.ac.rca.centrika.exceptions.BadRequestAlertException;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
+import rw.ac.rca.centrika.exceptions.UnAuthorizedException;
 import rw.ac.rca.centrika.models.Department;
 import rw.ac.rca.centrika.models.Role;
 import rw.ac.rca.centrika.models.User;
@@ -238,6 +241,20 @@ public class UserServiceImpl implements UserService {
         }
         catch (Exception e){
             throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
+    public User getLoggedInUser() {
+        UserPrincipal userSecurityDetails;
+        // Retrieve the currently authenticated user from the SecurityContextHolder
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null) {
+            userSecurityDetails = (UserPrincipal) authentication.getPrincipal();
+            return this.userRepository.findUserByEmail(userSecurityDetails.getUsername()).orElseThrow(() -> new UnAuthorizedException("You are not authorized! please login"));
+        } else {
+            throw new UnAuthorizedException("You are not authorized! please login");
         }
     }
 }
