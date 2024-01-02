@@ -99,6 +99,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findUserByEmailOrPhoneNumber(createAdminDTO.getEmail() , createAdminDTO.getPhoneNumber());
         if(optionalUser.isEmpty()){
             if(createAdminDTO.getRegistrationCode().equals(adminKey)){
+                try {
                 String activationCode = Utility.randomUUID(6 , 0 , 'N');
                 EStatus status =  EStatus.WAIT_EMAIL_VERIFICATION;
                 Role role = roleService.getRoleByName(EUserRole.ADMIN);
@@ -120,11 +121,14 @@ public class UserServiceImpl implements UserService {
                 Set<Role> roles = new HashSet<Role>();
                 roles.add(role);
                 user.setRoles(roles);
-                try {
+                    System.out.println("The codes have reached here");
                     mailService.sendAccountVerificationEmail(user);
+                    System.out.println("The codes have reached here after sending mail");
                     userRepository.save(user);
+                    System.out.println("The codes that save the user ");
                     return user;
                 }catch (Exception e){
+                    e.printStackTrace();
                     throw new  InternalServerErrorException(e.getMessage());
                 }
             }else{

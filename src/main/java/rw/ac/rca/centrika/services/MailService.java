@@ -52,10 +52,12 @@ public class MailService {
 
     public void sendAccountVerificationEmail(User user) {
         String link =frontHost+"auth/verify-email?email=" + user.getEmail() + "&code=" + user.getActivationCode();
+        System.out.println("The link data "+ link);
         Mail mail = new Mail(
                 appName,
                 "Welcome to "+appName+", Verify your email to continue",
                 user.getUsername(), user.getEmail(), link, "verify-email");
+        System.out.println("Sending email to "+user.getEmail());
         sendMail(mail);
     }
 
@@ -99,14 +101,20 @@ public class MailService {
             context.setVariable("otherData", mail.getOtherData());
             context.setVariable("subject",mail.getSubject());
 
+            System.out.println("IN the mail context");
+
             String html = templateEngine.process(mail.getTemplate(), context);
+            System.out.println("IN the mail context after eraht3");
             helper.setTo(mail.getToEmail());
+            System.out.println("IN the mail context after 3");
             helper.setText(html, true);
             helper.setSubject(mail.getSubject());
+            System.out.println("IN the mail context jibeiuer");
             helper.setFrom(appEmail);
             mailSender.send(message);
-            System.out.println("The link data "+ mail.getData());
+            System.out.println("The link data in the codes "+ mail.getData());
         } catch (MessagingException exception) {
+            exception.printStackTrace();
             throw new BadRequestAlertException("Failed To Send An Email : z"+  exception.getMessage());
         }
     }
