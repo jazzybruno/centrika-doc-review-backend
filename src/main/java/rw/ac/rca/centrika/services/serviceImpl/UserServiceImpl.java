@@ -207,7 +207,9 @@ public class UserServiceImpl implements UserService {
             userEntity.setEmail(inviteUserDTO.getEmail());
             userEntity.setUsername(inviteUserDTO.getUsername());
             Role role = roleService.getRoleByName(EUserRole.USER);
-            userEntity.getRoles().add(role);
+            HashSet<Role> roles = new HashSet<>();
+            roles.add(role);
+            userEntity.setRoles(roles);
             userEntity.setStatus(EStatus.DISABLED);
             mailService.sendInvitationEmail(userEntity);
             userRepository.save(userEntity);

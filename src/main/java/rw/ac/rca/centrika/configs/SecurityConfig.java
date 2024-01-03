@@ -54,7 +54,9 @@ public class SecurityConfig {
 			"/v3/api-docs/**",
 			"/actuator/*",
 			"/api/auth/**",
-			"/api/users/create-admin"
+			"/api/users/create-admin",
+			"/create-invite-user",
+			"/is-code-valid"
 	};
 
 	@Bean
