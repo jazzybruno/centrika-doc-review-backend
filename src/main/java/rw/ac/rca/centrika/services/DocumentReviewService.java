@@ -16,6 +16,7 @@ public interface DocumentReviewService {
     public List<DocumentReview> getAllDocumentReviews();
     public DocumentReview getDocumentReviewById(UUID docReviewId);
     DocumentReview requestDocumentReview(RequestReviewDTO requestReviewDTO) throws IOException;
+    boolean remindReviewer(UUID reviewerId);
     public DocumentReview updateDocumentReview(UUID docReviewId , UpdateDocumentReviewDTO updateDocumentReviewDTO) ;
     public DocumentReview deleteDocumentReview(UUID docReviewId);
     // other methods

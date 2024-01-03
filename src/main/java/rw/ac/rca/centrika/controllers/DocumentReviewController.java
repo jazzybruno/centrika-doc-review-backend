@@ -65,6 +65,16 @@ public class DocumentReviewController {
         }
     }
 
+    @PostMapping("/remind/{reviewerId}")
+    public ResponseEntity remindReviewer(@PathVariable UUID reviewerId) {
+        boolean isReminded = documentReviewService.remindReviewer(reviewerId);
+        return ResponseEntity.ok().body(new ApiResponse(
+                true,
+                "Successfully reminded reviewer",
+                isReminded
+        ));
+    }
+
     @PutMapping("/{docReviewId}")
     public ResponseEntity updateDocumentReview(@PathVariable UUID docReviewId, @RequestBody UpdateDocumentReviewDTO updateDocumentReviewDTO) {
         DocumentReview documentReview = documentReviewService.updateDocumentReview(docReviewId, updateDocumentReviewDTO);

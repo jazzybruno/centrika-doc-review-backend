@@ -75,7 +75,7 @@ public class MailService {
     }
 
     public void sendWelcomeEmail(User user) {
-        String link = frontHost + "auth/login";
+        String link = frontHost;
         Mail mail = new Mail(
                 appName,
                 "Welcome to"  +appName+", Your account was created",

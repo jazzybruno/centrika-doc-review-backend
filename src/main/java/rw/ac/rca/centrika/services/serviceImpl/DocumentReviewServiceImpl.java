@@ -113,6 +113,25 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     }
 
     @Override
+    public boolean remindReviewer(UUID reviewerId) {
+        Reviewer reviewer = reviewerService.findReviewerById(reviewerId);
+        User user = reviewer.getUser();
+        DocumentReview documentReview = reviewer.getDocumentReview();
+        String message = "Reminder to review a document from: " + documentReview.getCreatedBy().getUsername();
+        Notification notification = new Notification(
+                documentReview.getCreatedBy(),
+                user,
+                message
+        );
+        try {
+            notificationRepository.save(notification);
+            return true;
+        }catch (Exception e){
+            throw new InternalServerErrorException(e.getMessage());
+        }
+    }
+
+    @Override
     @Transactional
     public DocumentReview updateDocumentReview(UUID docReviewId, UpdateDocumentReviewDTO updateDocumentReviewDTO) {
         DocumentReview documentReview = this.getDocumentReviewById(docReviewId);
