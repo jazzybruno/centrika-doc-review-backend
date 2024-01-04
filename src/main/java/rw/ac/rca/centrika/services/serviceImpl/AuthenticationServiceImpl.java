@@ -17,6 +17,7 @@ import rw.ac.rca.centrika.services.MailService;
 import rw.ac.rca.centrika.services.UserService;
 import rw.ac.rca.centrika.utils.ExceptionUtils;
 import rw.ac.rca.centrika.utils.HashUtil;
+import rw.ac.rca.centrika.utils.Utility;
 
 import java.util.Optional;
 
@@ -103,6 +104,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public User initiatePasswordReset(String email) throws ResourceNotFoundException {
         try {
             User user = userRepository.findUserByEmail(email).orElseThrow(() -> new BadRequestAlertException("User with provided email not found"));
+            user.setActivationCode(Utility.randomUUID(6, 0, 'N'));
             mailService.sendResetPasswordMail(user);
             return user;
         }catch (Exception e){
