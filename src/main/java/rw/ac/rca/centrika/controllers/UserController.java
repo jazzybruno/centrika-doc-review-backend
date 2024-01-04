@@ -86,7 +86,7 @@ public class UserController {
     }
 
     // code validation
-    @GetMapping("/is-code-valid")
+    @PostMapping("/is-code-valid")
     public ResponseEntity validateUser(@RequestParam String email , @RequestParam String token) {
         boolean isValid = userService.isUserInvited(email, token);
         return ResponseEntity.ok().body(new ApiResponse(
