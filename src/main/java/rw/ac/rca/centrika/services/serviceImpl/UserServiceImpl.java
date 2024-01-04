@@ -75,15 +75,15 @@ public class UserServiceImpl implements UserService {
         try {
         User user = userRepository.findUserByEmail(createUserDTO.getEmail()).orElseThrow(()-> new NotFoundException("The user with the given email was not found"));
         if(user.getStatus().equals(EStatus.NO_PROFILE)){
-            user.setFirstName(createUserDTO.getFirstName());
-            user.setLastName(createUserDTO.getLastName());
-            user.setNationalId(createUserDTO.getNationalId());
-            user.setDateOfBirth(createUserDTO.getDateOfBirth());
+//            user.setFirstName(createUserDTO.getFirstName());
+//            user.setLastName(createUserDTO.getLastName());
+//            user.setNationalId(createUserDTO.getNationalId());
+//            user.setDateOfBirth(createUserDTO.getDateOfBirth());
             user.setGender(createUserDTO.getGender());
             user.setPhoneNumber(createUserDTO.getPhoneNumber());
             user.setStatus(EStatus.ACTIVE);
             user.setEmail(createUserDTO.getEmail());
-            user.setUsername(createUserDTO.getUsername());
+//            user.setUsername(createUserDTO.getUsername());
             user.setPassword(HashUtil.hashPassword(createUserDTO.getPassword()));
             return user;
         }else{
@@ -226,6 +226,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public boolean isUserInvited(String email, String token) {
         try {
             User user = userRepository.findUserByEmail(email).orElseThrow(()-> new NotFoundException("The user with the given email was not found"));
