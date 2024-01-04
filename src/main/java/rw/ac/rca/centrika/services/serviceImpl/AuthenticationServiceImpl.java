@@ -101,6 +101,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @Transactional
     public User initiatePasswordReset(String email) throws ResourceNotFoundException {
         try {
             User user = userRepository.findUserByEmail(email).orElseThrow(() -> new BadRequestAlertException("User with provided email not found"));
