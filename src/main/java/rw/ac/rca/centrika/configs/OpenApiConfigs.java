@@ -24,7 +24,7 @@ public class OpenApiConfigs {
             @Value("${openapi.service.url}") String url) {
         final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
-                .servers(List.of(new Server().url(url)))
+                .servers(List.of( new Server().url(url) , new Server().url("http://localhost:8000/")))
                 .components(
                         new Components()
                                 .addSecuritySchemes(

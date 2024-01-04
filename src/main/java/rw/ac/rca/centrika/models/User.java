@@ -59,8 +59,7 @@ public class User {
     @Column(name = "activation_code")
     private String activationCode;
     @JsonIgnore
-    @Column(name = "password")
-    @NotBlank (message = "Password is required")
+    @Column(name = "password" , nullable = true)
     private String password;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

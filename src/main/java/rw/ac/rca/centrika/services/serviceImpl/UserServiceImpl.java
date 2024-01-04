@@ -220,6 +220,7 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException(e.getMessage());
         }
         catch (Exception e){
+            e.printStackTrace();
             throw new InternalServerErrorException(e.getMessage());
         }
     }
