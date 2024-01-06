@@ -69,4 +69,4 @@ jobs:
             sudo docker pull docker.io/bruno2006/doc-review
             sudo docker stop doc-review || true
             sudo docker rm doc-review || true
-            sudo docker run -d --name doc-review -p 8800:8000 -v /doc-centr-review/files/uploads:/opt/uploads/educapp-backend/images docker.io/bruno2006/doc-review
+            sudo docker run -d --name doc-review -p 8800:8000 -v /doc-centr-review/files/uploads:/var/lib/educapp-backend/images docker.io/bruno2006/doc-review
