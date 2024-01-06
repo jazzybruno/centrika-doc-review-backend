@@ -42,9 +42,8 @@ public class FileServiceImpl implements FileService {
     @Override
     public File getFile(String fileName) throws IOException {
         Path filePath = Path.of(uploadDir + File.separator + fileName);
-        System.out.println(filePath.toString());
+        System.out.println(filePath);
         File file = filePath.toFile();
-
         if (file.exists()) {
             return file;
         } else {

@@ -57,7 +57,7 @@ public class SecurityConfig {
 			"/api/users/create-admin",
 			"/api/users/create-invite-user",
 			"/api/users/is-code-valid",
-
+			"/api/documents/download/**",
 	};
 
 	@Bean

@@ -56,17 +56,20 @@ public class DocumentController {
 
     @GetMapping("/download/{docName}")
     public ResponseEntity downloadDocument(@PathVariable String docName) throws IOException {
-        File file = fileService.getFile(docName);
-        System.out.println(file.toURI());
-        // create a resource
-        Resource resource = new UrlResource(file.toURI());
-        // check if the resource is available and readable
-        if(resource.exists() && resource.isReadable()){
-            return  ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""  + resource.getFilename() + "\"")
-                    .body(resource);
-        }else{
-            return ResponseEntity.notFound().build();
-        }
+       try {
+              File file = fileService.getFile(docName);
+              Resource resource = new UrlResource(file.toURI());
+              return ResponseEntity.ok()
+                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                     .body(resource);
+       }catch (Exception e){
+           e.printStackTrace();
+              return ResponseEntity.badRequest().body(new ApiResponse(
+                     false,
+                     "Error while processing the request: " + e.getMessage(),
+                     null
+              ));
+       }
     }
 
     @GetMapping("/by-department/{deptId}")

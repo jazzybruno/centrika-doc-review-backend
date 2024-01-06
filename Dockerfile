@@ -9,12 +9,15 @@ FROM openjdk:17
 WORKDIR /app
 
 # Create the directory
-RUN mkdir -p /opt/uploads/educapp-backend/images
+RUN mkdir -p /var/lib/educapp-backend/images
 
 # Set directory permissions
-RUN chmod 777 /opt/uploads/educapp-backend/images
+RUN chmod 777 /var/lib/educapp-backend/images
 
 # Copy the packaged JAR
 COPY --from=builder /app/target/*.jar app.jar
+
+# Define a volume for the data directory
+VOLUME /var/lib/educapp-backend/images
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
