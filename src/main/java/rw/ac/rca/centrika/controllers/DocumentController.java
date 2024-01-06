@@ -57,6 +57,7 @@ public class DocumentController {
     @GetMapping("/download/{docName}")
     public ResponseEntity downloadDocument(@PathVariable String docName) throws IOException {
         File file = fileService.getFile(docName);
+        System.out.println(file.toURI());
         // create a resource
         Resource resource = new UrlResource(file.toURI());
         // check if the resource is available and readable
