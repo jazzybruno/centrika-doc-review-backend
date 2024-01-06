@@ -203,6 +203,7 @@ public class UserServiceImpl implements UserService {
             if(userByEmail != null){
                 throw new BadRequestAlertException("The user with the given email already exists");
             }
+            Department department = departmentRepository.findById(inviteUserDTO.getDeptId()).orElseThrow(()-> {throw new NotFoundException("the Department was not found");});
             User userEntity = new User();
             userEntity.setEmail(inviteUserDTO.getEmail());
             userEntity.setUsername(inviteUserDTO.getUsername());
@@ -210,6 +211,7 @@ public class UserServiceImpl implements UserService {
             HashSet<Role> roles = new HashSet<>();
             roles.add(role);
             userEntity.setRoles(roles);
+            userEntity.setDepartment(department);
             userEntity.setStatus(EStatus.DISABLED);
             mailService.sendInvitationEmail(userEntity);
             userRepository.save(userEntity);
