@@ -65,6 +65,24 @@ public class DocumentReviewController {
         }
     }
 
+    @PatchMapping("/change-final-reviewer/{docReviewId}/{newFinalReviewerId}")
+    public ResponseEntity changeWhoHasFinalReview(@PathVariable UUID docReviewId , @PathVariable UUID newFinalReviewerId) {
+        try {
+            DocumentReview documentReview = documentReviewService.changeWhoHasFinalReview(docReviewId , newFinalReviewerId);
+            return ResponseEntity.ok().body(new ApiResponse(
+                    true,
+                    "Successfully changed who has final review",
+                    documentReview
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ApiResponse(
+                    false,
+                    "Error while processing the request: " + e.getMessage(),
+                    null
+            ));
+        }
+    }
+
     @PostMapping("/remind/{reviewerId}")
     public ResponseEntity remindReviewer(@PathVariable UUID reviewerId) {
         boolean isReminded = documentReviewService.remindReviewer(reviewerId);

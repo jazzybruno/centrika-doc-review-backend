@@ -3,6 +3,7 @@ package rw.ac.rca.centrika.services;
 import org.springframework.web.multipart.MultipartFile;
 import rw.ac.rca.centrika.dtos.SetDeadlineDTO;
 import rw.ac.rca.centrika.dtos.requests.*;
+import rw.ac.rca.centrika.exceptions.ResourceNotFoundException;
 import rw.ac.rca.centrika.models.DocumentReview;
 
 import javax.print.Doc;
@@ -16,6 +17,7 @@ public interface DocumentReviewService {
     public List<DocumentReview> getAllDocumentReviews();
     public DocumentReview getDocumentReviewById(UUID docReviewId);
     DocumentReview requestDocumentReview(RequestReviewDTO requestReviewDTO) throws IOException;
+    DocumentReview changeWhoHasFinalReview(UUID docReviewId , UUID newFinalReviewerId) throws ResourceNotFoundException;
     boolean remindReviewer(UUID reviewerId);
     public DocumentReview updateDocumentReview(UUID docReviewId , UpdateDocumentReviewDTO updateDocumentReviewDTO) ;
     public DocumentReview deleteDocumentReview(UUID docReviewId);

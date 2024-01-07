@@ -11,9 +11,11 @@ import rw.ac.rca.centrika.dtos.SetDeadlineDTO;
 import rw.ac.rca.centrika.dtos.requests.*;
 import rw.ac.rca.centrika.enumerations.EDocStatus;
 import rw.ac.rca.centrika.enumerations.EReviewStatus;
+import rw.ac.rca.centrika.enumerations.EReviewerStatus;
 import rw.ac.rca.centrika.exceptions.BadRequestAlertException;
 import rw.ac.rca.centrika.exceptions.InternalServerErrorException;
 import rw.ac.rca.centrika.exceptions.NotFoundException;
+import rw.ac.rca.centrika.exceptions.ResourceNotFoundException;
 import rw.ac.rca.centrika.models.*;
 import rw.ac.rca.centrika.repositories.ICommentRepository;
 import rw.ac.rca.centrika.repositories.IDepartmentHeadRepository;
@@ -23,6 +25,7 @@ import rw.ac.rca.centrika.services.DepartmentService;
 import rw.ac.rca.centrika.services.DocumentReviewService;
 import rw.ac.rca.centrika.services.ReviewActionService;
 import rw.ac.rca.centrika.services.ReviewerService;
+import rw.ac.rca.centrika.utils.ExceptionUtils;
 
 import javax.print.Doc;
 import java.io.IOException;
@@ -110,6 +113,39 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
             }catch (Exception e){
                 throw new InternalServerErrorException(e.getMessage());
             }
+    }
+
+    @Override
+    @Transactional
+    public DocumentReview changeWhoHasFinalReview(UUID docReviewId, UUID newFinalReviewerId) throws ResourceNotFoundException {
+        try {
+            DocumentReview documentReview = this.getDocumentReviewById(docReviewId);
+            List<Reviewer> reviewers = reviewerService.findByDocumentReviewId(docReviewId);
+            Reviewer newFinalReviewer = reviewerService.findReviewerById(newFinalReviewerId);
+            if(newFinalReviewer == null){
+                throw new NotFoundException("The reviewer was not found");
+            }
+            if(!newFinalReviewer.getDocumentReview().getId().equals(docReviewId)){
+                throw new BadRequestAlertException("The reviewer is not in the document review");
+            }
+            Reviewer  oldFinalReviewer = null;
+            for (Reviewer reviewer : reviewers) {
+                if(reviewer.isHasFinalReview() && reviewer.getStatus().equals(EReviewerStatus.PENDING)){
+                    oldFinalReviewer = reviewer;
+                    reviewer.setHasFinalReview(false);
+                    newFinalReviewer.setHasFinalReview(true);
+                }
+            }
+            if(oldFinalReviewer == null){
+                throw new BadRequestAlertException("The document review does not have a final reviewer or he has already reviewed the document");
+            }else{
+                return documentReview;
+            }
+
+        }catch (Exception e){
+            ExceptionUtils.handleServiceExceptions(e);
+            return null;
+        }
     }
 
     @Override
