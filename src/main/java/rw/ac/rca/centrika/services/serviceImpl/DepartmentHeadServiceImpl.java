@@ -139,7 +139,7 @@ public class DepartmentHeadServiceImpl implements DepartmentHeadService {
     @Override
     public DepartmentHead getDepartmentHeadByUserId(UUID userId) {
         try {
-            return departmentHeadRepository.findDepartmentHeadByUserId(userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found")));
+            return departmentHeadRepository.findDepartmentHeadByUserId(userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"))).orElseThrow(()-> new NotFoundException("Department head not found"));
         }catch (Exception e){
             throw new InternalServerErrorException("Error while getting department head by user id");
         }

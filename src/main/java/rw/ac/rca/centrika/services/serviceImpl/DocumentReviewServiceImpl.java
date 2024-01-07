@@ -303,7 +303,8 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
     public DocumentReview setDeadlineForReview(UUID documentReviewId, SetDeadlineDTO deadline) {
         DocumentReview documentReview = this.getDocumentReviewById(documentReviewId);
         List<Reviewer> reviewers = reviewerService.findByDocumentReviewId(documentReviewId);
-        DepartmentHead departmentHead = departmentHeadRepository.findById(deadline.getDepartmentHeadId()).orElseThrow(() -> {throw new NotFoundException("The department head was not found");
+        User userHead = userService.getUserById(deadline.getDepartmentHeadId());
+        DepartmentHead departmentHead = departmentHeadRepository.findDepartmentHeadByUserId(userHead).orElseThrow(() -> {throw new NotFoundException("The department head was not found");
         });
         try {
             documentReview.setDeadline(deadline.getDeadline());
