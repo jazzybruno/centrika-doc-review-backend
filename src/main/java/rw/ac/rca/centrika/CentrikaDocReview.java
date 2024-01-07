@@ -3,6 +3,7 @@ package rw.ac.rca.centrika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -16,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SpringBootApplication
+@EnableCaching
 public class CentrikaDocReview {
 	private RoleServiceImpl roleService;
 	@Autowired

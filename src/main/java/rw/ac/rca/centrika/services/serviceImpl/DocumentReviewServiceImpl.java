@@ -76,7 +76,13 @@ public class DocumentReviewServiceImpl implements DocumentReviewService {
         Date expectedCompleteTime = requestReviewDTO.getExpectedCompleteTime();
         Date deadline = null;
         if (expectedCompleteTime != null){
-            deadline = new Date(expectedCompleteTime.getTime() - 86400000);
+            Date now = new Date();
+            if (expectedCompleteTime.before(now)){
+                throw new BadRequestAlertException("The expected complete time must be in the future");
+            }
+            Date timeBetweenNowAndExpectedCompleteTime = new Date(expectedCompleteTime.getTime() - now.getTime());
+            // use it to set the deadline as the deadline should the time between now and expected complete time divided by 2
+            deadline = new Date(now.getTime() + (timeBetweenNowAndExpectedCompleteTime.getTime() / 2));
         }
         DocumentReview documentReview = new DocumentReview(
                 document,
