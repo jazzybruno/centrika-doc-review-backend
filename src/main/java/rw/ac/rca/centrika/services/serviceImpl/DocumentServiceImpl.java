@@ -91,7 +91,7 @@ public class DocumentServiceImpl implements DocumentService {
         }
         User user = userService.getUserById(createDocumentDTO.getCreator());
         String fileName = fileService.uploadFile(docFile);
-        EDocStatus status = EDocStatus.APPROVED;
+        EDocStatus status = EDocStatus.UPLOADED;
         ECategory category = createDocumentDTO.getCategory();
         document.setTitle(createDocumentDTO.getTitle());
         document.setDescription(createDocumentDTO.getDescription());
