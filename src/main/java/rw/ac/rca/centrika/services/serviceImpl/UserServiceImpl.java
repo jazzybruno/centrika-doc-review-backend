@@ -75,10 +75,10 @@ public class UserServiceImpl implements UserService {
         try {
         User user = userRepository.findUserByEmail(createUserDTO.getEmail()).orElseThrow(()-> new NotFoundException("The user with the given email was not found"));
         if(user.getStatus().equals(EStatus.NO_PROFILE)){
-//            user.setFirstName(createUserDTO.getFirstName());
-//            user.setLastName(createUserDTO.getLastName());
-//            user.setNationalId(createUserDTO.getNationalId());
-//            user.setDateOfBirth(createUserDTO.getDateOfBirth());
+            user.setFirstName(createUserDTO.getFirstName());
+            user.setLastName(createUserDTO.getLastName());
+            user.setNationalId(createUserDTO.getNationalId());
+            user.setDateOfBirth(createUserDTO.getDateOfBirth());
             user.setGender(createUserDTO.getGender());
             user.setPhoneNumber(createUserDTO.getPhoneNumber());
             user.setStatus(EStatus.ACTIVE);
